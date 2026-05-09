@@ -3,10 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Bullet : MonoBehaviour
 {
+    //do:弾同士の衝突の挙動をどうするか
     [Tooltip("BulletSetting")]
-    [SerializeField] private float speed = 10f;
     [SerializeField] private int damage = 1;
     [SerializeField] private float lifeTime = 5f;
+    private float speed;
     private float _currentLifeTime;
     private Rigidbody2D _rb;
     private Vector2 _direction;
@@ -22,8 +23,10 @@ public class Bullet : MonoBehaviour
     /// </summary>
     /// <param name="direction">発射方向</param>
     /// <param name="owner">この弾を発射したタンクのBulletManager</param>
-    public void Initialize(Vector2 direction, TankBulletManager owner)
+    /// <param name="speed">弾速</param>
+    public void Initialize(Vector2 direction, TankBulletManager owner, float speed)
     {
+        this.speed = speed;
         _owner = owner;
         _direction = direction.normalized;
         _rb.linearVelocity = _direction * speed;

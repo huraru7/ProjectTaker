@@ -10,16 +10,20 @@ public class TankStatus : MonoBehaviour
     [Header("Status")]
     [SerializeField] private SerializableReactiveProperty<int> HP;
     [SerializeField] private SerializableReactiveProperty<int> maxHP;
+    [SerializeField] private SerializableReactiveProperty<int> baseAttackPower;
     [SerializeField] private SerializableReactiveProperty<int> movementSpeed;
     [SerializeField] private SerializableReactiveProperty<int> turnRate;
+    [SerializeField] private SerializableReactiveProperty<float> bulletSpeed;
     [SerializeField] private SerializableReactiveProperty<int> magazineCapacity;
     [SerializeField] private SerializableReactiveProperty<float> reloadTime;
 
     public SerializableReactiveProperty<int> getHP => HP;
     public SerializableReactiveProperty<int> getMaxHP => maxHP;
+    public SerializableReactiveProperty<int> getBaseAttackPower => baseAttackPower;
     public SerializableReactiveProperty<int> getMagazineCapacity => magazineCapacity;
     public SerializableReactiveProperty<int> getMovementSpeed => movementSpeed;
     public SerializableReactiveProperty<int> getTurnRate => turnRate;
+    public SerializableReactiveProperty<float> getBulletSpeed => bulletSpeed;
     public SerializableReactiveProperty<float> getReloadTime => reloadTime;
 
     void Awake()
@@ -32,8 +36,10 @@ public class TankStatus : MonoBehaviour
 
         HP = new(data.maxHP);
         maxHP = new(data.maxHP);
+        baseAttackPower = new(data.baseAttackPower);
         movementSpeed = new(data.movementSpeed);
         turnRate = new(data.turnRate);
+        bulletSpeed = new(data.bulletSpeed);
         magazineCapacity = new(data.magazineCapacity);
         reloadTime = new(data.reloadTime);
     }
@@ -45,8 +51,10 @@ public class TankStatus : MonoBehaviour
     {
         HP.Value = data.maxHP;
         maxHP.Value = data.maxHP;
+        baseAttackPower.Value = data.baseAttackPower;
         movementSpeed.Value = data.movementSpeed;
         turnRate.Value = data.turnRate;
+        bulletSpeed.Value = data.bulletSpeed;
         magazineCapacity.Value = data.magazineCapacity;
         reloadTime.Value = data.reloadTime;
     }

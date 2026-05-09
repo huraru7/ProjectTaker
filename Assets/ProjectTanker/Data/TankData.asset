@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: TankData
   m_EditorClassIdentifier: Assembly-CSharp::TankData
   maxHP: 1
-  baseAttackPower: 0
+  baseAttackPower: 1
   movementSpeed: 1
   turnRate: 6
+  bulletSpeed: 10
   magazineCapacity: 5
   reloadTime: 5

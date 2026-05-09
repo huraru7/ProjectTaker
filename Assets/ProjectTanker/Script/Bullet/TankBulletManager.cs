@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 public class TankBulletManager : MonoBehaviour
 {
-    //:弾システムを作る
     [Header("TankStatus")]
     [SerializeField] private TankStatus _tankStatus;
 
@@ -85,7 +84,7 @@ public class TankBulletManager : MonoBehaviour
 
         b.transform.position = transform.position;
         b.gameObject.SetActive(true);
-        b.Initialize(direction, this);
+        b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value);
         totalRounds.Value--;
     }
 

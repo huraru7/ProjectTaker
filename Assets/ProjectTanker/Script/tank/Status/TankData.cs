@@ -10,6 +10,7 @@ public class TankData : ScriptableObject
     [Tooltip("旋回速度")] public int turnRate;
 
     [Header("Bullet Status")]
+    [Tooltip("弾速")] public float bulletSpeed;
     [Tooltip("総弾数")] public int magazineCapacity;
     [Tooltip("リロード時間")] public float reloadTime;
 

@@ -10,7 +10,7 @@ public class TankMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float turnRate = 2f;
 
-    [Header("Tank")]
+    // [Header("Tank")]
     // [SerializeField] private GameObject tankBarrel;
 
     [SerializeField] private TankStatus _tankStatus;
