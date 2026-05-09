@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TankData
   maxHP: 1
   baseAttackPower: 1
-  movementSpeed: 1
+  movementSpeed: 5
   turnRate: 6
   bulletSpeed: 10
   magazineCapacity: 5
