@@ -437,7 +437,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1070510721}
-  m_Father: {fileID: 1643216106}
+  m_Father: {fileID: 1875774511}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -458,7 +458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InventoryUI
   panel: {fileID: 1070510720}
   itemPrefab: {fileID: 1303590462027928277, guid: 277a9e8dfcfd55645b0f46a69d9a47c9, type: 3}
-  itemContainer: {fileID: 75603852}
+  itemContainer: {fileID: 1070510721}
 --- !u!1 &123003081
 GameObject:
   m_ObjectHideFlags: 0
@@ -2581,7 +2581,6 @@ RectTransform:
   - {fileID: 1408093428}
   - {fileID: 671325453}
   - {fileID: 202300772}
-  - {fileID: 75603852}
   m_Father: {fileID: 1875774511}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -2838,6 +2837,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1643216106}
+  - {fileID: 75603852}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3319,7 +3319,7 @@ MonoBehaviour:
   tankStatus: {fileID: 781938003}
   tankModuleManager: {fileID: 781938004}
   getModuleSelectUI: {fileID: 1643216107}
-  inventoryUI: {fileID: 0}
+  inventoryUI: {fileID: 75603853}
 --- !u!4 &2069904911
 Transform:
   m_ObjectHideFlags: 0
