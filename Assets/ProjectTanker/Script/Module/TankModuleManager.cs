@@ -20,6 +20,9 @@ public class TankModuleManager : MonoBehaviour
     private readonly Subject<ModuleData[]> _onModuleCandidatesGenerated = new();
     public Observable<ModuleData[]> OnModuleCandidatesGenerated => _onModuleCandidatesGenerated;
 
+    private readonly Subject<IReadOnlyList<ModuleData>> _onInventoryChanged = new();
+    public Observable<IReadOnlyList<ModuleData>> OnInventoryChanged => _onInventoryChanged;
+
     public void Start()
     {
         ModuleEarn();//:デバッグ
@@ -48,11 +51,13 @@ public class TankModuleManager : MonoBehaviour
     {
         if (selected == null) return;
         moduleInventory.Add(selected);
+        _onInventoryChanged.OnNext(moduleInventory); //:インベントリ変化を通知
     }
 
     private void OnDestroy()
     {
         _onModuleCandidatesGenerated.Dispose();
+        _onInventoryChanged.Dispose();
     }
 
     /// <summary>

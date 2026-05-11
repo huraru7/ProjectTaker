@@ -9,6 +9,7 @@ public class TankPresenter : MonoBehaviour
 
     [Header("View")]
     [SerializeField] private GetModuleSelectUI getModuleSelectUI;
+    [SerializeField] private InventoryUI inventoryUI;
 
     void Start()
     {
@@ -20,6 +21,11 @@ public class TankPresenter : MonoBehaviour
         //:View→Model: プレイヤーが選択したらインベントリへ追加
         getModuleSelectUI.OnModuleSelected
             .Subscribe(selected => tankModuleManager.AddToInventory(selected))
+            .AddTo(this);
+
+        //:Model→View: インベントリが変化したら一覧を更新
+        tankModuleManager.OnInventoryChanged
+            .Subscribe(inventory => inventoryUI.UpdateDisplay(inventory))
             .AddTo(this);
     }
 }
