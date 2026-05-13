@@ -27,5 +27,7 @@ public class TankPresenter : MonoBehaviour
         tankModuleManager.OnInventoryChanged
             .Subscribe(inventory => inventoryUI.UpdateDisplay(inventory))
             .AddTo(this);
+
+        tankModuleManager.ModuleEarn();//:デバッグ用
     }
 }

@@ -23,10 +23,6 @@ public class TankModuleManager : MonoBehaviour
     private readonly Subject<IReadOnlyList<ModuleData>> _onInventoryChanged = new();
     public Observable<IReadOnlyList<ModuleData>> OnInventoryChanged => _onInventoryChanged;
 
-    public void Start()
-    {
-        ModuleEarn();//:デバッグ
-    }
     /// <summary>
     /// 3択候補を生成してPresenterへ通知する
     /// </summary>
@@ -102,7 +98,6 @@ public class TankModuleManager : MonoBehaviour
     /// </summary>
     private void RecalculateStats()
     {
-        //!:再計算する前にstatusを初期値に戻してから計算してください
         _tankStatus.ResetStatus();
 
         foreach (var (module, count) in stackCounts)
