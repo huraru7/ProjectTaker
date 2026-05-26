@@ -1,23 +1,31 @@
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SlotItemUI : MonoBehaviour
+public class SlotItemUI : MonoBehaviour, IDropHandler
 {
     //:装備スロット1つ分のUI
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private GameObject emptyIndicator; //:空スロット時に表示するオブジェクト
 
-    public ModuleData Data { get; private set; } //:ドラッグドロップ実装時に参照する
+    public ModuleData Data { get; private set; }
 
-    public void Setup(ModuleData data)
+    private Action<ModuleData> _onDrop;
+
+    public void Setup(ModuleData data, Action<ModuleData> onDrop = null)
     {
         Data = data;
+        _onDrop = onDrop;
         bool isEmpty = data == null;
-        emptyIndicator.SetActive(isEmpty);
-        iconImage.gameObject.SetActive(!isEmpty);
+        iconImage.sprite = isEmpty ? null : data.icon;
         nameText.text = isEmpty ? "" : data.moduleName;
-        if (!isEmpty) iconImage.sprite = data.icon;
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        if (InventoryItemUI.DraggingData != null)
+            _onDrop?.Invoke(InventoryItemUI.DraggingData);
     }
 }

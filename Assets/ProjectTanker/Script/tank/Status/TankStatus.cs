@@ -59,6 +59,20 @@ public class TankStatus : MonoBehaviour
         reloadTime.Value = data.reloadTime;
     }
 
+    /// <summary>
+    /// 現在HPを維持したままステータスをリセットする（モジュール再計算用）
+    /// </summary>
+    public void ResetStatusWithoutHP()
+    {
+        maxHP.Value = data.maxHP;
+        baseAttackPower.Value = data.baseAttackPower;
+        movementSpeed.Value = data.movementSpeed;
+        turnRate.Value = data.turnRate;
+        bulletSpeed.Value = data.bulletSpeed;
+        magazineCapacity.Value = data.magazineCapacity;
+        reloadTime.Value = data.reloadTime;
+    }
+
     public void DealDamage(int amount)
     {
         if (amount <= 0) return;

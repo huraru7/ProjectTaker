@@ -51,6 +51,7 @@ public class TankModuleManager : MonoBehaviour
     {
         if (selected == null) return;
         moduleInventory.Add(selected);
+        Debug.Log($"[Inventory] 追加: {selected.moduleName}  現在の所持数: {moduleInventory.Count}");
         _onInventoryChanged.OnNext(moduleInventory); //:インベントリ変化を通知
     }
 
@@ -75,13 +76,19 @@ public class TankModuleManager : MonoBehaviour
         //:slotsを更新
         //:入れる予定のスロットにあるモジュールを見て、入っていたら古いモジュールを減らす
         ModuleData oldModule = slots[slotIndex];
-        if (oldModule != null)
+        if (oldModule != null && stackCounts.ContainsKey(oldModule))
         {
             stackCounts[oldModule]--;
+            if (stackCounts[oldModule] <= 0)
+                stackCounts.Remove(oldModule);
         }
 
         //:新しいモジュールに置き換える
         slots[slotIndex] = newModule;
+
+        //:インベントリから除去して変化を通知
+        if (newModule != null && moduleInventory.Remove(newModule))
+            _onInventoryChanged.OnNext(moduleInventory);
 
         //:新しいモジュールがnullでなければ新しいモジュールのカウントを増やす
         if (newModule != null)
@@ -94,6 +101,11 @@ public class TankModuleManager : MonoBehaviour
             stackCounts[newModule]++;
         }
 
+        Debug.Log($"[Slot] スロット{slotIndex} にセット: {newModule?.moduleName ?? "null"}  (前: {oldModule?.moduleName ?? "null"})");
+        Debug.Log($"[Inventory] 残り所持数: {moduleInventory.Count}");
+        foreach (var (m, c) in stackCounts)
+            Debug.Log($"[StackCount] {m.moduleName}: {c}");
+
         //:効果の再計算を行う
         RecalculateStats();
         _onSlotsChanged.OnNext(slots); //:スロット変化を通知
@@ -104,7 +116,7 @@ public class TankModuleManager : MonoBehaviour
     /// </summary>
     private void RecalculateStats()
     {
-        _tankStatus.ResetStatus();
+        _tankStatus.ResetStatusWithoutHP();
 
         foreach (var (module, count) in stackCounts)
         {

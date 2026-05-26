@@ -29,6 +29,11 @@ public class TankPresenter : MonoBehaviour
             .Subscribe(inventory => inventoryUI.UpdateDisplay(inventory))
             .AddTo(this);
 
+        //:View→Model: ドラッグドロップでモジュールをスロットへ装備
+        slotUI.OnModuleDropped
+            .Subscribe(e => tankModuleManager.SetModule(e.slotIndex, e.module))
+            .AddTo(this);
+
         //:初期表示（全スロット空状態）
         slotUI.UpdateDisplay(tankModuleManager.Slots);
 
