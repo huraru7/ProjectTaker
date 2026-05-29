@@ -530,7 +530,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 218867917}
   nameText: {fileID: 1120411434}
-  emptyIndicator: {fileID: 70870988}
 --- !u!1 &75603851
 GameObject:
   m_ObjectHideFlags: 0
@@ -632,7 +631,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 799606954}
   nameText: {fileID: 1903757147}
-  emptyIndicator: {fileID: 114658750}
 --- !u!1 &123003081
 GameObject:
   m_ObjectHideFlags: 0
@@ -1044,7 +1042,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 1061178703}
   nameText: {fileID: 810532882}
-  emptyIndicator: {fileID: 188664248}
 --- !u!1 &196357281
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,7 +1297,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207237283}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
@@ -1387,7 +1384,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 522906738}
   nameText: {fileID: 361136202}
-  emptyIndicator: {fileID: 215482049}
 --- !u!1 &218867915
 GameObject:
   m_ObjectHideFlags: 0
@@ -2076,7 +2072,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 386165206}
   nameText: {fileID: 2090759137}
-  emptyIndicator: {fileID: 477854284}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3564,7 +3559,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 38890837}
   nameText: {fileID: 1280342923}
-  emptyIndicator: {fileID: 1061581425}
 --- !u!1 &1070510720
 GameObject:
   m_ObjectHideFlags: 0
@@ -4204,7 +4198,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItemUI
   iconImage: {fileID: 173225917}
   nameText: {fileID: 140527810}
-  emptyIndicator: {fileID: 1515101130}
 --- !u!1 &1587526331
 GameObject:
   m_ObjectHideFlags: 0

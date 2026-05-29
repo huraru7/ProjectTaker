@@ -19,7 +19,7 @@ public class SlotUI : MonoBehaviour
         {
             int capturedIndex = i;
             ModuleData data = i < slots.Count ? slots[i] : null;
-            slotItems[i].Setup(data, dropped => _onModuleDropped.OnNext((capturedIndex, dropped)));
+            slotItems[i].Setup(data, capturedIndex, dropped => _onModuleDropped.OnNext((capturedIndex, dropped)));
         }
     }
 

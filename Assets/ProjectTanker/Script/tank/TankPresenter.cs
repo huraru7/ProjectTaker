@@ -34,6 +34,11 @@ public class TankPresenter : MonoBehaviour
             .Subscribe(e => tankModuleManager.SetModule(e.slotIndex, e.module))
             .AddTo(this);
 
+        //:View→Model: スロットからインベントリへドラッグドロップで取り外し
+        inventoryUI.OnModuleReturnedFromSlot
+            .Subscribe(slotIndex => tankModuleManager.RemoveFromSlot(slotIndex))
+            .AddTo(this);
+
         //:初期表示（全スロット空状態）
         slotUI.UpdateDisplay(tankModuleManager.Slots);
 

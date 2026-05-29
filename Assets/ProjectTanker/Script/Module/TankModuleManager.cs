@@ -55,6 +55,19 @@ public class TankModuleManager : MonoBehaviour
         _onInventoryChanged.OnNext(moduleInventory); //:インベントリ変化を通知
     }
 
+    /// <summary>
+    /// スロットのモジュールを取り外してインベントリへ戻す
+    /// </summary>
+    public void RemoveFromSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= slots.Length) return;
+        ModuleData module = slots[slotIndex];
+        if (module == null) return;
+
+        SetModule(slotIndex, null);
+        AddToInventory(module);
+    }
+
     private void OnDestroy()
     {
         _onModuleCandidatesGenerated.Dispose();

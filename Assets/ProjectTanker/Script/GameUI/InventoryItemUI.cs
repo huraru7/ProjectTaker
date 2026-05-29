@@ -18,12 +18,14 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     public void Setup(ModuleData data)
     {
         Data = data;
-        iconImage.sprite = data.icon;
-        nameText.text = data.moduleName;
+        bool isEmpty = data == null;
+        iconImage.sprite = isEmpty ? null : data.icon;
+        nameText.text = isEmpty ? "" : data.moduleName;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (Data == null) return;
         DraggingData = Data;
         _rootCanvas = GetComponentInParent<Canvas>().rootCanvas;
 
@@ -37,7 +39,7 @@ public class InventoryItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         UpdateGhostPosition(eventData);
     }
 
-    public void OnDrag(PointerEventData eventData) => UpdateGhostPosition(eventData);
+    public void OnDrag(PointerEventData eventData) { if (_ghost == null) return; UpdateGhostPosition(eventData); }
 
     public void OnEndDrag(PointerEventData eventData)
     {
