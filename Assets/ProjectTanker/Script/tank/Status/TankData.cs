@@ -13,7 +13,4 @@ public class TankData : ScriptableObject
     [Tooltip("弾速")] public float bulletSpeed;
     [Tooltip("総弾数")] public int magazineCapacity;
     [Tooltip("リロード時間")] public float reloadTime;
-
-    //:欲しいやつリスト
-    //:基礎攻撃力　
 }

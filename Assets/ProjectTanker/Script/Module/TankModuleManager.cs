@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using R3;
 using UnityEngine;
 
 public class TankModuleManager : MonoBehaviour
@@ -10,21 +11,68 @@ public class TankModuleManager : MonoBehaviour
     [Tooltip("存在するモジュール一覧")][SerializeField] private List<ModuleData> moduleLists;
     [Tooltip("所持モジュールインベントリ")] public List<ModuleData> moduleInventory { get; private set; } = new List<ModuleData>();
     [Tooltip("装備slot")] private ModuleData[] slots = new ModuleData[7];
+    public IReadOnlyList<ModuleData> Slots => slots;
 
     /// <summary>
     /// 持っているモジュールの種類と個数を記録する辞書型のデータ
     /// </summary>
     private Dictionary<ModuleData, int> stackCounts = new();
 
+    private readonly Subject<ModuleData[]> _onModuleCandidatesGenerated = new();
+    public Observable<ModuleData[]> OnModuleCandidatesGenerated => _onModuleCandidatesGenerated;
+
+    private readonly Subject<IReadOnlyList<ModuleData>> _onInventoryChanged = new();
+    public Observable<IReadOnlyList<ModuleData>> OnInventoryChanged => _onInventoryChanged;
+
+    private readonly Subject<IReadOnlyList<ModuleData>> _onSlotsChanged = new();
+    public Observable<IReadOnlyList<ModuleData>> OnSlotsChanged => _onSlotsChanged;
+
     /// <summary>
-    /// 新規モジュールを獲得しインベントリへ追加
+    /// 3択候補を生成してPresenterへ通知する
     /// </summary>
     public void ModuleEarn()
     {
-        //do:モジュールの獲得システム モジュールを３択からプライヤーが選ぶ形で獲得する ３択のモジュールはランダム(多少の重さはつけたほうがいいかもしれない.ゲームバランス的に)
-        int randomIndex = Random.Range(0, moduleLists.Count);
-        ModuleData newModule = moduleLists[randomIndex];
-        moduleInventory.Add(newModule);
+        //do:重みつきランダムへの改良を検討(ゲームバランス的に)
+        List<ModuleData> pool = new(moduleLists);
+        ModuleData[] candidates = new ModuleData[Mathf.Min(3, pool.Count)];
+        for (int i = 0; i < candidates.Length; i++)
+        {
+            int idx = Random.Range(0, pool.Count);
+            candidates[i] = pool[idx];
+            pool.RemoveAt(idx);
+        }
+        _onModuleCandidatesGenerated.OnNext(candidates);
+    }
+
+    /// <summary>
+    /// プレイヤーが選んだモジュールをインベントリへ追加
+    /// </summary>
+    public void AddToInventory(ModuleData selected)
+    {
+        if (selected == null) return;
+        moduleInventory.Add(selected);
+        Debug.Log($"[Inventory] 追加: {selected.moduleName}  現在の所持数: {moduleInventory.Count}");
+        _onInventoryChanged.OnNext(moduleInventory); //:インベントリ変化を通知
+    }
+
+    /// <summary>
+    /// スロットのモジュールを取り外してインベントリへ戻す
+    /// </summary>
+    public void RemoveFromSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= slots.Length) return;
+        ModuleData module = slots[slotIndex];
+        if (module == null) return;
+
+        SetModule(slotIndex, null);
+        AddToInventory(module);
+    }
+
+    private void OnDestroy()
+    {
+        _onModuleCandidatesGenerated.Dispose();
+        _onInventoryChanged.Dispose();
+        _onSlotsChanged.Dispose();
     }
 
     /// <summary>
@@ -41,13 +89,19 @@ public class TankModuleManager : MonoBehaviour
         //:slotsを更新
         //:入れる予定のスロットにあるモジュールを見て、入っていたら古いモジュールを減らす
         ModuleData oldModule = slots[slotIndex];
-        if (oldModule != null)
+        if (oldModule != null && stackCounts.ContainsKey(oldModule))
         {
             stackCounts[oldModule]--;
+            if (stackCounts[oldModule] <= 0)
+                stackCounts.Remove(oldModule);
         }
 
         //:新しいモジュールに置き換える
         slots[slotIndex] = newModule;
+
+        //:インベントリから除去して変化を通知
+        if (newModule != null && moduleInventory.Remove(newModule))
+            _onInventoryChanged.OnNext(moduleInventory);
 
         //:新しいモジュールがnullでなければ新しいモジュールのカウントを増やす
         if (newModule != null)
@@ -60,8 +114,14 @@ public class TankModuleManager : MonoBehaviour
             stackCounts[newModule]++;
         }
 
+        Debug.Log($"[Slot] スロット{slotIndex} にセット: {newModule?.moduleName ?? "null"}  (前: {oldModule?.moduleName ?? "null"})");
+        Debug.Log($"[Inventory] 残り所持数: {moduleInventory.Count}");
+        foreach (var (m, c) in stackCounts)
+            Debug.Log($"[StackCount] {m.moduleName}: {c}");
+
         //:効果の再計算を行う
         RecalculateStats();
+        _onSlotsChanged.OnNext(slots); //:スロット変化を通知
     }
 
     /// <summary>
@@ -69,8 +129,7 @@ public class TankModuleManager : MonoBehaviour
     /// </summary>
     private void RecalculateStats()
     {
-        //!:再計算する前にstatusを初期値に戻してから計算してください
-        _tankStatus.ResetStatus();
+        _tankStatus.ResetStatusWithoutHP();
 
         foreach (var (module, count) in stackCounts)
         {

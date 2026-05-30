@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aafff0ac387d84036b49187cd4d491cc, type: 3}
+  m_Name: Module
+  m_EditorClassIdentifier: Assembly-CSharp::ModuleData
+  moduleName: testmodule
+  description: test^test^test
+  icon: {fileID: -1081386278238201723, guid: 57c095fb3d8121f4193c6ff29e0567be, type: 3}
+  moduleElement: 0
+  specialEffects: []
