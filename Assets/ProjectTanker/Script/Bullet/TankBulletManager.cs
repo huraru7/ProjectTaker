@@ -14,6 +14,11 @@ public class TankBulletManager : MonoBehaviour
     [SerializeField] private SerializableReactiveProperty<int> totalRounds;
     public SerializableReactiveProperty<int> getTotalRounds => totalRounds;
 
+    // リロード進捗 0–1（弾が満タンのときは 0）
+    public float ReloadProgress => _tankStatus != null && totalRounds.Value < _tankStatus.getMagazineCapacity.Value
+        ? Mathf.Clamp01(currentTime / _tankStatus.getReloadTime.Value)
+        : 0f;
+
     [Header("PoolSize")]
     [SerializeField] private int _poolSize = 5;
     [SerializeField] private Transform _bulletParent;
