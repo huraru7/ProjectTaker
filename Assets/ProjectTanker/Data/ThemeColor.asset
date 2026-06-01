@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7014d42bf29391e4bbb0b8a7f684f290, type: 3}
+  m_Name: ThemeColor
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectTanker.UI.ThemeColor
+  background: {r: 0.941, g: 0.929, b: 0.91, a: 1}
+  panel: {r: 0.914, g: 0.898, b: 0.875, a: 1}
+  border: {r: 0.812, g: 0.788, b: 0.761, a: 1}
+  textPrimary: {r: 0.239, g: 0.22, b: 0.2, a: 1}
+  textSecondary: {r: 0.478, g: 0.463, b: 0.435, a: 1}
+  buttonDefault: {r: 0.867, g: 0.847, b: 0.82, a: 1}
+  buttonAccent: {r: 0.71, g: 0.686, b: 0.655, a: 1}
+  earth: {r: 0.486, g: 0.722, b: 0.494, a: 1}
+  water: {r: 0.482, g: 0.686, b: 0.831, a: 1}
+  fire: {r: 0.878, g: 0.478, b: 0.373, a: 1}
+  wind: {r: 0.949, g: 0.8, b: 0.416, a: 1}
+  none: {r: 0.69, g: 0.671, b: 0.639, a: 1}
