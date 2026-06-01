@@ -55,28 +55,130 @@ None         #B0ABA3
 
 ## 2. フォントのセットアップ
 
-### 2-1. Noto Sans JP のダウンロード
+> **Unity 6 の注意**: Font Asset Creator は操作タイミングによってエディタがクラッシュする既知の問題があります。  
+> 以下の手順を飛ばさず丁寧に進めてください。
 
-1. [Google Fonts](https://fonts.google.com/noto/specimen/Noto+Sans+JP) から `NotoSansJP-Regular.ttf` と `NotoSansJP-Bold.ttf` をダウンロード
-2. `Assets/ProjectTanker/Art/Font/` フォルダを作成してその中に配置
+---
 
-### 2-2. TextMeshPro フォントアセットの生成
+### 2-1. TMP Essentials のインポート（初回のみ）
+
+フォント作業の前に TextMeshPro の基本アセットをインポートします。
+
+1. Unity メニュー `Window > TextMeshPro > Import TMP Essentials` をクリック
+2. ダイアログが開いたら `Import TMP Essentials` ボタンを押す
+3. インポートが完了するまで待つ（`Assets/TextMesh Pro/` フォルダが生成される）
+
+> すでにインポート済みの場合はスキップして OK です。
+
+---
+
+### 2-2. Noto Sans JP のダウンロードと配置
+
+1. ブラウザで `https://fonts.google.com/` を開く
+2. 検索欄に `Noto Sans JP` と入力して選択
+3. 右上の **「Download family」** ボタンをクリック → ZIP がダウンロードされる
+4. ZIP を解凍し、以下の2ファイルを取り出す
+   - `NotoSansJP-Regular.ttf`
+   - `NotoSansJP-Bold.ttf`
+5. Unity の Project ウィンドウで `Assets/ProjectTanker/Art/Font/` フォルダを作成
+6. 取り出した `.ttf` ファイルをそのフォルダにドラッグ&ドロップ
+
+---
+
+### 2-3. 日本語文字リストの準備
+
+TextMeshPro は初期状態では英数字しか対応していません。  
+日本語（ひらがな・カタカナ・漢字）を表示するには、使う文字をあらかじめ登録する必要があります。
+
+1. ブラウザで以下の URL を開く  
+   `https://gist.github.com/kgsi/ed2f1c5696a2211c1fd1e1e198c96ee4`
+2. ページ内の `japanese_full.txt` の **「Raw」** ボタンをクリック
+3. 表示された全テキストを `Ctrl+A` → `Ctrl+C` でコピー
+4. メモ帳などに貼り付けて `japanese_full.txt` という名前で **UTF-8** で保存しておく  
+   （メモ帳の場合：名前を付けて保存 → 文字コード「UTF-8」を選択）
+
+> このファイルにはひらがな・カタカナ・JIS第1〜第2水準の漢字（約6,000字）・記号が含まれています。
+
+---
+
+### 2-4. Font Asset Creator の設定と生成
+
+#### 手順
 
 1. Unity メニュー `Window > TextMeshPro > Font Asset Creator` を開く
-2. `Source Font File` に `NotoSansJP-Regular.ttf` をセット
-3. 設定値：
-   - **Atlas Resolution**: 2048 × 2048
-   - **Character Set**: Unicode Range（日本語対応）
-   - **Render Mode**: SDFAA
-4. `Generate Font Atlas` → 完了後 `Save` を押し `Assets/ProjectTanker/Art/Font/` に保存
-5. Bold 版も同じ手順で生成
+2. `Source Font File` に `NotoSansJP-Regular.ttf` をドラッグ&ドロップ
+3. 以下の通りに設定する
 
-> 生成に数分かかる場合があります。完了するまで待ってください。
+| 設定項目 | 設定値 |
+|---|---|
+| **Sampling Point Size** | Auto Sizing |
+| **Padding** | **8**（重要：0のままだとクラッシュする場合あり） |
+| **Packing Method** | Fast |
+| **Atlas Resolution** | **8192 × 8192**（日本語は 2048 では文字がぼやける） |
+| **Character Set** | **Custom Characters** |
+| **Render Mode** | SDFAA |
+| **Get Kerning Pairs** | ON |
 
-### 2-3. デフォルトフォントの変更（任意）
+4. `Character Set` を `Custom Characters` に変更すると、テキストボックスが出現する  
+5. テキストボックスを**一度クリックしてフォーカスを当て**、先ほどコピーした `japanese_full.txt` の中身を貼り付ける（`Ctrl+V`）
+
+> ⚠️ **重要（クラッシュ対策）**  
+> 貼り付けた直後、Unity 下部にプログレスバーが表示されることがあります。  
+> **プログレスバーが完全に消えるまで（2〜3分）何もクリックしないで待ってください。**  
+> プログレスバーが消える前に `Generate Font Atlas` を押すとクラッシュします。
+
+6. プログレスバーが完全に消えたことを確認してから **`Generate Font Atlas`** をクリック
+7. 生成が始まります（Atlas サイズと文字数によって **1〜5分** かかります）
+8. 右側のプレビューに文字が並んだら完了
+9. **`Save`** ボタンをクリック → 保存先として `Assets/ProjectTanker/Art/Font/` を指定して保存
+
+#### Bold 版も同じ手順で生成
+
+`NotoSansJP-Bold.ttf` も同じ設定で Font Asset を生成し保存します。
+
+---
+
+### 2-5. フォントアセットが生成できない・クラッシュする場合
+
+**方法A: 文字数を減らして生成**
+
+全漢字ではなく、ひらがな・カタカナ・常用漢字のみに絞る場合：
+
+1. `Character Set` を **`Extended ASCII`** に設定
+2. 追加で以下を `Custom Characters` に入力：
+
+```
+あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョッーヴ
+```
+
+3. Atlas Resolution を `4096 × 4096` に下げて生成
+
+**方法B: Dynamic フォントを使う（おすすめ）**
+
+事前に全文字を登録せず、実行時に必要な文字を動的に追加する方法です。  
+文字登録の手間がなく、レアな漢字も自動対応できます。
+
+1. `Source Font File` に `NotoSansJP-Regular.ttf` をセット
+2. **`Character Set`** を **`ASCII`** のままにする（文字リスト不要）
+3. **`Atlas Resolution`** を `1024 × 1024` に設定
+4. **`Generate Font Atlas`** をクリック（数秒で完了）
+5. **`Save`** で保存
+6. 保存した `.asset` ファイルを Project ウィンドウで選択
+7. Inspector で **`Atlas Population Mode`** を **`Dynamic`** に変更
+8. **`Multi Atlas Textures`** を **ON** にする
+9. `Ctrl+S` でアセットを保存
+
+> Dynamic モードは実行時に自動的に文字テクスチャを追加するため、事前のリスト登録が不要です。  
+> ゲーム規模が大きくない場合はこちらの方が簡単です。
+
+---
+
+### 2-6. デフォルトフォントの変更
 
 1. `Edit > Project Settings > TextMesh Pro` を開く
-2. `Default Font Asset` に生成した `NotoSansJP-Regular SDF` をセット
+2. **`Default Font Asset`** に生成した `NotoSansJP-Regular SDF.asset` をドラッグ&ドロップ
+
+これで新規に作成する TextMeshProUGUI は自動的に日本語対応フォントを使います。
 
 ---
 
