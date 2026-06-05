@@ -1,20 +1,6 @@
 # Unity エディタ作業ガイド — Shapez 風 UI 構築
 
-> スクリプトの追加・変更は完了済み。このファイルの手順に沿って Unity エディタ側の設定を行ってください。  
-> 上から順に進めると依存関係で詰まりません。
-
----
-
-## 目次
-
-1. [ThemeColor アセットの作成](#1-themecolor-アセットの作成)
-2. [フォントのセットアップ](#2-フォントのセットアップ)
-3. [カメラ・Canvas 背景色の設定](#3-カメラcanvas-背景色の設定)
-4. [モジュール3択UI のリデザイン](#4-モジュール3択ui-のリデザイン)
-5. [装備スロット UI のリデザイン](#5-装備スロット-ui-のリデザイン)
-6. [インベントリ UI のリデザイン](#6-インベントリ-ui-のリデザイン)
-7. [ゲーム内 HUD の作成](#7-ゲーム内-hud-の作成)
-8. [動作確認チェックリスト](#8-動作確認チェックリスト)
+> スクリプトの追加・変更は完了済み。このファイルの手順に沿って Unity エディタ側の設定を行ってください。
 
 ---
 
@@ -36,453 +22,366 @@ Wind         #F2CC6A
 None         #B0ABA3
 ```
 
-> Unity の Color フィールドに16進数を入力するには、カラーピッカーを開いて左下の「#」欄にそのまま貼り付けます。
+> Unity の Color フィールドに16進数を入力するには、カラーピッカーを開いて左下の「#」欄に貼り付けます。
 
 ---
 
-## 1. ThemeColor アセットの作成
+## ✅ 完了済み作業（1〜6）
 
-`ThemeColor` は全 UI がカラーを参照する ScriptableObject です。最初に作成してください。
-
-1. **Project ウィンドウ**で `Assets/ProjectTanker/Data/` を右クリック
-2. `Create > ProjectTanker > ThemeColor` を選択
-3. 生成された `ThemeColor.asset` を選択
-4. Inspector で各色フィールドに[カラーリファレンス](#カラーリファレンスコピー用)の値を入力
-
-> `ThemeColor` が見当たらない場合は Unity が再コンパイル中です。しばらく待ってから再試行してください。
-
----
-
-## 2. フォントのセットアップ
-
-> **Unity 6 の注意**: Font Asset Creator は操作タイミングによってエディタがクラッシュする既知の問題があります。  
-> 以下の手順を飛ばさず丁寧に進めてください。
+| # | 作業内容 | 備考 |
+|---|---|---|
+| 1 | ThemeColor アセットの作成 | `Assets/ProjectTanker/Data/ThemeColor.asset` |
+| 2 | フォントのセットアップ | NotoSansJP を Dynamic モードで生成、デフォルト設定済み |
+| 3 | カメラ・Canvas 背景色の設定 | カメラ背景・背景パネルを `#F0EDE8` に変更済み |
+| 4 | モジュール3択UI のリデザイン | AccentBar・カード型レイアウト・ホバー効果を設定済み |
+| 5 | 装備スロット UI のリデザイン | AccentLine・SlotNumber・ThemeColor アサイン済み |
+| 6 | インベントリ UI のリデザイン | ElementDot・Vertical Layout Group・Prefab 保存済み |
 
 ---
 
-### 2-1. TMP Essentials のインポート（初回のみ）
-
-フォント作業の前に TextMeshPro の基本アセットをインポートします。
-
-1. Unity メニュー `Window > TextMeshPro > Import TMP Essentials` をクリック
-2. ダイアログが開いたら `Import TMP Essentials` ボタンを押す
-3. インポートが完了するまで待つ（`Assets/TextMesh Pro/` フォルダが生成される）
-
-> すでにインポート済みの場合はスキップして OK です。
-
----
-
-### 2-2. Noto Sans JP のダウンロードと配置
-
-1. ブラウザで `https://fonts.google.com/` を開く
-2. 検索欄に `Noto Sans JP` と入力して選択
-3. 右上の **「Download family」** ボタンをクリック → ZIP がダウンロードされる
-4. ZIP を解凍し、以下の2ファイルを取り出す
-   - `NotoSansJP-Regular.ttf`
-   - `NotoSansJP-Bold.ttf`
-5. Unity の Project ウィンドウで `Assets/ProjectTanker/Art/Font/` フォルダを作成
-6. 取り出した `.ttf` ファイルをそのフォルダにドラッグ&ドロップ
-
----
-
-### 2-3. 日本語文字リストの準備
-
-TextMeshPro は初期状態では英数字しか対応していません。  
-日本語（ひらがな・カタカナ・漢字）を表示するには、使う文字をあらかじめ登録する必要があります。
-
-1. ブラウザで以下の URL を開く  
-   `https://gist.github.com/kgsi/ed2f1c5696a2211c1fd1e1e198c96ee4`
-2. ページ内の `japanese_full.txt` の **「Raw」** ボタンをクリック
-3. 表示された全テキストを `Ctrl+A` → `Ctrl+C` でコピー
-4. メモ帳などに貼り付けて `japanese_full.txt` という名前で **UTF-8** で保存しておく  
-   （メモ帳の場合：名前を付けて保存 → 文字コード「UTF-8」を選択）
-
-> このファイルにはひらがな・カタカナ・JIS第1〜第2水準の漢字（約6,000字）・記号が含まれています。
-
----
-
-### 2-4. Font Asset Creator の設定と生成
-
-#### 手順
-
-1. Unity メニュー `Window > TextMeshPro > Font Asset Creator` を開く
-2. `Source Font File` に `NotoSansJP-Regular.ttf` をドラッグ&ドロップ
-3. 以下の通りに設定する
-
-| 設定項目 | 設定値 |
-|---|---|
-| **Sampling Point Size** | Auto Sizing |
-| **Padding** | **8**（重要：0のままだとクラッシュする場合あり） |
-| **Packing Method** | Fast |
-| **Atlas Resolution** | **8192 × 8192**（日本語は 2048 では文字がぼやける） |
-| **Character Set** | **Custom Characters** |
-| **Render Mode** | SDFAA |
-| **Get Kerning Pairs** | ON |
-
-4. `Character Set` を `Custom Characters` に変更すると、テキストボックスが出現する  
-5. テキストボックスを**一度クリックしてフォーカスを当て**、先ほどコピーした `japanese_full.txt` の中身を貼り付ける（`Ctrl+V`）
-
-> ⚠️ **重要（クラッシュ対策）**  
-> 貼り付けた直後、Unity 下部にプログレスバーが表示されることがあります。  
-> **プログレスバーが完全に消えるまで（2〜3分）何もクリックしないで待ってください。**  
-> プログレスバーが消える前に `Generate Font Atlas` を押すとクラッシュします。
-
-6. プログレスバーが完全に消えたことを確認してから **`Generate Font Atlas`** をクリック
-7. 生成が始まります（Atlas サイズと文字数によって **1〜5分** かかります）
-8. 右側のプレビューに文字が並んだら完了
-9. **`Save`** ボタンをクリック → 保存先として `Assets/ProjectTanker/Art/Font/` を指定して保存
-
-#### Bold 版も同じ手順で生成
-
-`NotoSansJP-Bold.ttf` も同じ設定で Font Asset を生成し保存します。
-
----
-
-### 2-5. フォントアセットが生成できない・クラッシュする場合
-
-**方法A: 文字数を減らして生成**
-
-全漢字ではなく、ひらがな・カタカナ・常用漢字のみに絞る場合：
-
-1. `Character Set` を **`Extended ASCII`** に設定
-2. 追加で以下を `Custom Characters` に入力：
-
-```
-あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽぁぃぅぇぉゃゅょっーアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォャュョッーヴ
-```
-
-3. Atlas Resolution を `4096 × 4096` に下げて生成
-
-**方法B: Dynamic フォントを使う（おすすめ）**
-
-事前に全文字を登録せず、実行時に必要な文字を動的に追加する方法です。  
-文字登録の手間がなく、レアな漢字も自動対応できます。
-
-1. `Source Font File` に `NotoSansJP-Regular.ttf` をセット
-2. **`Character Set`** を **`ASCII`** のままにする（文字リスト不要）
-3. **`Atlas Resolution`** を `1024 × 1024` に設定
-4. **`Generate Font Atlas`** をクリック（数秒で完了）
-5. **`Save`** で保存
-6. 保存した `.asset` ファイルを Project ウィンドウで選択
-7. Inspector で **`Atlas Population Mode`** を **`Dynamic`** に変更
-8. **`Multi Atlas Textures`** を **ON** にする
-9. `Ctrl+S` でアセットを保存
-
-> Dynamic モードは実行時に自動的に文字テクスチャを追加するため、事前のリスト登録が不要です。  
-> ゲーム規模が大きくない場合はこちらの方が簡単です。
-
----
-
-### 2-6. デフォルトフォントの変更
-
-1. `Edit > Project Settings > TextMesh Pro` を開く
-2. **`Default Font Asset`** に生成した `NotoSansJP-Regular SDF.asset` をドラッグ&ドロップ
-
-これで新規に作成する TextMeshProUGUI は自動的に日本語対応フォントを使います。
-
----
-
-## 3. カメラ・Canvas 背景色の設定
-
-### 3-1. カメラの背景色
-
-1. Hierarchy で `MainCamera` を選択
-2. Inspector の `Camera` コンポーネント → `Background` を `#F0EDE8` に変更
-
-### 3-2. Canvas の背景パネル
-
-Canvas 直下に全画面を覆う背景パネルがある場合：
-
-1. Hierarchy でその `Image` GameObject を選択
-2. `Image` コンポーネント → `Color` を `#F0EDE8` に変更
-
-背景パネルがまだない場合：
-
-1. Hierarchy で `Canvas` を右クリック → `UI > Image`
-2. 名前を `Background` に変更
-3. `RectTransform` の Anchor を **Stretch / Stretch**（四隅すべて）に設定
-4. Left/Right/Top/Bottom をすべて `0`
-5. `Color` を `#F0EDE8` に変更
-6. Hierarchy の順序を一番上（最背面）に移動（`Background` を一番上にドラッグ）
-
----
-
-## 4. モジュール3択UI のリデザイン
-
-**対象シーン**: `1_MainGame.unity`  
-**対象 GameObject**: `Canvas > ModuleSelectPanel_3`
-
-### 4-1. パネル背景
-
-1. `ModuleSelectPanel_3` の `Image` コンポーネント → `Color` を `#E9E5DF`、Alpha `230`（約90%）に変更
-2. `RectTransform` のサイズを調整（例: Width 560, Height 320）
-3. 画面中央に配置（Anchor を Middle/Center に）
-
-> **角丸にするには**: 角丸の9スライス用スプライトを用意するか、Unity 2021.2+ であれば Image の `Image Type = Sliced` に角丸スプライトを使います。シンプルに始める場合はまず平面でも問題ありません。
-
-### 4-2. 各選択肢ボタン（カード型）のリデザイン
-
-`ModuleSelectPanel_3` 以下に3つの選択肢オブジェクト（`ModuleOptionButton`）があります。
-
-**1つのカードの構成（他の2つも同じ構造にする）**:
-
-```
-[ModuleOptionButton] （Button コンポーネント付き）
-├── AccentBar          Image（カード上部の属性カラーバー、Height: 8px）
-├── IconImage          Image（アイコン表示、サイズ: 64×64）
-└── NameText           TextMeshProUGUI（モジュール名）
-```
-
-#### 手順
-
-1. 各 `ModuleOptionButton` の GameObject を選択し、Image コンポーネントのカラーを `#E9E5DF` に設定
-2. 子に `UI > Image` を追加して名前を `AccentBar` に変更
-   - Height: `8`、幅は親いっぱいに（Anchor: Top/Stretch）
-   - Top を `0` に設定（カード上部に接する）
-   - Color はスクリプトが実行時に設定するので白（#FFFFFF）のままでOK
-3. アイコン用 `Image`（IconImage）のサイズを **64×64** に調整、中央に配置
-4. `NameText` を `ModuleOptionButton` の下部に配置
-   - フォントサイズ: 14、Color: `#3D3833`
-5. `ModuleOptionButton` スクリプトの Inspector で各フィールドをアサイン：
-   - `Button` → 自身の `Button` コンポーネント
-   - `Icon Image` → `IconImage` オブジェクト
-   - `Name Text` → `NameText` オブジェクト
-   - `Accent Bar` → `AccentBar` オブジェクト
-   - `Theme` → `ThemeColor.asset`
-
-### 4-3. ボタンのホバー効果
-
-1. 各カードの `Button` コンポーネント → `Transition` を `Color Tint` に
-2. `Highlighted Color` を `#DDD8D1`、`Pressed Color` を `#B5AFA7` に変更
-
----
-
-## 5. 装備スロット UI のリデザイン
-
-**対象 GameObject**: `Canvas > Slot`
-
-### 5-1. スロット全体の配置
-
-1. `Slot` オブジェクトの `RectTransform` を画面下部中央に配置
-   - Anchor: **Bottom/Center**
-   - Pos Y: `40`（下から少し浮かせる）
-2. `Slot` に `Horizontal Layout Group` コンポーネントを追加
-   - Spacing: `8`
-   - Child Alignment: Middle Center
-
-### 5-2. 各 SlotItem のリデザイン
-
-`Slot` 以下に `SlotItem` × 7 があります。1つずつ以下の構成にします（他も同じ）。
-
-```
-[SlotItem] （RectTransform: 72×80）
-├── Background         Image（スロット背景）
-├── IconImage          Image（モジュールアイコン、サイズ: 48×48）
-├── NameText           TextMeshProUGUI（モジュール名、フォントサイズ: 10）
-├── AccentLine         Image（スロット下部の属性カラーライン）
-└── SlotNumber         TextMeshProUGUI（スロット番号、フォントサイズ: 10）
-```
-
-#### 手順
-
-1. 各 `SlotItem` のルート `Image` の Color を `#E9E5DF` に変更（背景）
-2. 子に `AccentLine` を追加
-   - Anchor: **Bottom/Stretch**、Height: `4`、Bottom: `0`
-   - Color は実行時にスクリプトが設定するので白のままでOK
-3. 子に `SlotNumber` を追加
-   - Anchor: **Top/Left**、サイズ: 20×16、オフセット: (2, -2)
-   - フォントサイズ: 10、Color: `#7A766F`
-   - Text はスクリプトが実行時に設定するので空白でOK
-4. `SlotItemUI` スクリプトの Inspector で各フィールドをアサイン：
-   - `Icon Image` → `IconImage`
-   - `Name Text` → `NameText`
-   - `Accent Line` → `AccentLine`
-   - `Slot Number` → `SlotNumber`
-   - `Theme` → `ThemeColor.asset`
-
-> **7つ全部に同じ設定が必要**です。1つ設定したら Prefab 化して残りは Prefab から作ると効率的です。
-
----
-
-## 6. インベントリ UI のリデザイン
-
-**対象 GameObject**: `Canvas > ModuleInventory`  
-**対象 Prefab**: `Assets/ProjectTanker/Prefab/ModuleInventoryPanel.prefab`
-
-### 6-1. パネルの配置・スタイル
-
-1. `ModuleInventory` の `panel` オブジェクトを選択
-2. `RectTransform` を右側サイドパネルに変更：
-   - Anchor: **Right/Stretch**（上下いっぱい、右端固定）
-   - Width: `240`
-   - Right: `0`
-3. `Image` の Color: `#E9E5DF`
-
-### 6-2. アイテム Prefab (`InventoryItemUI`) のリデザイン
-
-`ModuleInventoryPanel.prefab` を開いてアイテムのテンプレートを編集します。
-
-```
-[InventoryItemUI] （RectTransform: 216×48）
-├── IconImage        Image（サイズ: 40×40、左端）
-├── NameText         TextMeshProUGUI（フォントサイズ: 13）
-└── ElementDot       Image（円形、サイズ: 12×12、右端）
-```
-
-#### 手順
-
-1. Prefab を開いてルートの `Image` Color を `#E9E5DF` に
-2. 子に `ElementDot` を追加
-   - Anchor: **Right/Middle**
-   - サイズ: 12×12、Right: `8`
-   - Sprite は `UI/Default`（円形に見せるため `Image Type` は `Simple`、`Preserve Aspect` ON）
-3. `InventoryItemUI` スクリプトの Inspector で各フィールドをアサイン：
-   - `Icon Image` → `IconImage`
-   - `Name Text` → `NameText`
-   - `Element Dot` → `ElementDot`
-   - `Theme` → `ThemeColor.asset`
-4. Prefab を保存（`Ctrl+S`）
-
-### 6-3. itemContainer のレイアウト設定
-
-1. `panel` 内の `itemContainer`（アイテムを生成する親）を選択
-2. `Vertical Layout Group` を追加：
-   - Spacing: `4`
-   - Child Force Expand Width: ON、Height: OFF
-   - Padding: Left 12, Right 12, Top 8, Bottom 8
+## 目次（残り作業）
+
+7. [ゲーム内 HUD の作成](#7-ゲーム内-hud-の作成)
+8. [動作確認・テスト手順](#8-動作確認テスト手順)
+9. [トラブルシューティング](#9-トラブルシューティング)
 
 ---
 
 ## 7. ゲーム内 HUD の作成
 
-### 7-1. HUD 用 GameObject の作成
+HUD はゲームプレイ中に常時表示される HP バーと弾数表示です。  
+`GameHUD.cs` スクリプトは作成済みなので、Unity 側で GameObject とコンポーネントを組み立てます。
 
-1. Hierarchy で `Canvas` を右クリック → `Create Empty`
+### 7-1. HUD の親 GameObject を作成
+
+1. Hierarchy で `Canvas` を右クリック → **`Create Empty`**
 2. 名前を `HUD` に変更
-3. `HUD` に `GameHUD` スクリプトをアタッチ
+3. `RectTransform` の Anchor を **Stretch / Stretch**（四隅すべて）に設定し Left/Right/Top/Bottom をすべて `0` にする（Canvas 全体を覆う）
+4. `HUD` を選択した状態で Inspector の **`Add Component`** → `GameHUD` を検索してアタッチ
+
+---
 
 ### 7-2. HP バーの作成
 
+HP バーは画面左上に固定します。
+
+#### GameObject の構成
+
 ```
-[HUD]
-└── HPArea                     （Anchor: Top/Left、サイズ 200×32、Pos: (16, -16)）
-    ├── HPBackground           Image（Color: #CFC9C2、角丸なら9スライス）
-    ├── HPFill                 Image（Color: #E07A5F 初期値、Image Type: Filled、Fill Method: Horizontal）
-    └── HPText                 TextMeshProUGUI（Color: #3D3833、フォントサイズ: 12、中央揃え）
+HUD
+└── HPArea
+    ├── HPBackground   （背景の枠）
+    ├── HPFill         （実際に縮むバー）
+    └── HPText         （"12 / 12" のテキスト）
 ```
 
 #### 手順
 
-1. `HUD` 以下に `Create Empty` → 名前 `HPArea`
-   - RectTransform: Anchor Top/Left、Width: 200、Height: 32、Pos X: 16、Pos Y: -16
-2. 子に `HPBackground`（Image）を追加
-   - Anchor: Stretch/Stretch（全面）
-   - Color: `#CFC9C2`
-3. 子に `HPFill`（Image）を追加
-   - Anchor: Stretch/Stretch（全面）
-   - Color: `#E07A5F`
-   - `Image Type`: **Filled**
-   - `Fill Method`: **Horizontal**
-   - `Fill Origin`: **Left**
-   - `Fill Amount`: `1.0`（初期値）
-4. 子に `HPText`（TextMeshProUGUI）を追加
-   - Anchor: Stretch/Stretch（全面）
-   - Alignment: Center/Middle
-   - フォントサイズ: 12、Color: `#3D3833`
+**HPArea を作成する**
+
+1. `HUD` を右クリック → `Create Empty` → 名前を `HPArea` に変更
+2. `RectTransform` を以下に設定：
+
+| 項目 | 値 |
+|---|---|
+| Anchor | **Top Left**（左上固定） |
+| Pivot | `0, 1` |
+| Pos X | `16` |
+| Pos Y | `-16` |
+| Width | `200` |
+| Height | `32` |
+
+**HPBackground を作成する**
+
+1. `HPArea` を右クリック → `UI > Image` → 名前を `HPBackground` に変更
+2. Anchor を **Stretch / Stretch**（全面）に設定、Left/Right/Top/Bottom = `0`
+3. `Color` を `#CFC9C2` に設定
+
+**HPFill を作成する**
+
+1. `HPArea` を右クリック → `UI > Image` → 名前を `HPFill` に変更
+2. Anchor を **Stretch / Stretch**（全面）に設定、Left/Right/Top/Bottom = `0`
+3. `Color` を `#E07A5F` に設定（スクリプトが HP 残量に応じて変化させる）
+4. `Image Type` を **`Filled`** に変更
+5. `Fill Method` を **`Horizontal`** に変更
+6. `Fill Origin` を **`Left`** に変更
+7. `Fill Amount` を **`1`** に設定（初期値：満タン）
+
+> ⚠️ `Image Type` を Filled にしないと HP が減っても見た目が変わりません。必ず設定してください。
+
+**HPText を作成する**
+
+1. `HPArea` を右クリック → `UI > Text - TextMeshPro` → 名前を `HPText` に変更
+2. Anchor を **Stretch / Stretch**（全面）に設定、Left/Right/Top/Bottom = `0`
+3. Inspector の TextMeshPro コンポーネントを設定：
+   - `Text` 欄に `12 / 12`（仮の表示、実行時にスクリプトが書き換える）
+   - `Font Size` : `12`
+   - `Alignment` : **Center / Middle**（水平・垂直とも中央）
+   - `Color` : `#3D3833`
+
+---
 
 ### 7-3. 弾数表示エリアの作成
 
+弾数表示は画面右下に固定します。
+
+#### GameObject の構成
+
 ```
-[HUD]
-└── AmmoArea                   （Anchor: Bottom/Right、Pos: (-16, 16)）
-    ├── AmmoContainer          （Horizontal Layout Group、弾アイコンを横並びにする親）
-    ├── AmmoBulletPrefab       Image（弾アイコン1つのテンプレート、非表示 SetActive:false）
-    └── ReloadCircle           Image（Image Type: Filled、Radial 360、初期非表示）
+HUD
+└── AmmoArea
+    ├── AmmoContainer      （弾アイコンを横並びに生成する親）
+    ├── AmmoBulletPrefab   （弾アイコンのテンプレート、非表示）
+    └── ReloadCircle       （リロード中に表示する円形プログレス、非表示）
 ```
 
-#### AmmoBulletPrefab の作成
+#### 手順
 
-1. `AmmoArea` 以下に `UI > Image` を追加 → 名前 `AmmoBulletPrefab`
-2. サイズ: **16×16**
-3. Sprite に弾丸の形のアイコンをアサイン（なければ `UI/Default` でも可）
-4. **GameObject を非表示に**（`SetActive(false)` で良いが、Prefab 扱いなので Inspector 上部のチェックをOFFにする）
+**AmmoArea を作成する**
 
-> **注意**: `AmmoBulletPrefab` は Instantiate のテンプレートとして使うので、Hierarchy 上に置いたまま非表示にします。
+1. `HUD` を右クリック → `Create Empty` → 名前を `AmmoArea` に変更
+2. `RectTransform` を以下に設定：
 
-#### ReloadCircle の作成
+| 項目 | 値 |
+|---|---|
+| Anchor | **Bottom Right**（右下固定） |
+| Pivot | `1, 0` |
+| Pos X | `-16` |
+| Pos Y | `16` |
+| Width | `200` |
+| Height | `40` |
 
-1. `AmmoArea` 以下に `UI > Image` を追加 → 名前 `ReloadCircle`
-2. サイズ: **40×40**
-3. Sprite に円形のスプライトをアサイン（`UI/Default` を円形にするか、専用スプライトを用意）
-4. `Image Type`: **Filled**
-5. `Fill Method`: **Radial 360**
-6. `Fill Origin`: **Top**
-7. `Fill Amount`: `0.0`（初期値）
-8. Color: `#7A766F`（グレー）
-9. GameObject を**非表示**に（スクリプトが制御するため）
+**AmmoContainer を作成する**
+
+1. `AmmoArea` を右クリック → `Create Empty` → 名前を `AmmoContainer` に変更
+2. Anchor を **Stretch / Stretch**（全面）に設定
+3. `Add Component` → **`Horizontal Layout Group`** を追加
+   - `Spacing` : `4`
+   - `Child Alignment` : **Middle Right**
+   - `Control Child Size` : Width・Height ともに OFF
+   - `Child Force Expand` : Width・Height ともに OFF
+
+**AmmoBulletPrefab を作成する**
+
+1. `AmmoArea` を右クリック → `UI > Image` → 名前を `AmmoBulletPrefab` に変更
+2. サイズ: Width `16`、Height `16`
+3. `Color` を `#3D3833` に設定
+4. Sprite は弾丸アイコンがあればアサイン、なければ `UI/Default`（白い四角）で仮置きでOK
+5. Inspector 上部のチェックボックス（GameObject の有効/無効）を **OFF（非表示）** にする
+
+> `AmmoBulletPrefab` は Instantiate のテンプレートとして使います。Hierarchy 上に置いたまま非表示にしてください。
+
+**ReloadCircle を作成する**
+
+1. `AmmoArea` を右クリック → `UI > Image` → 名前を `ReloadCircle` に変更
+2. サイズ: Width `32`、Height `32`
+3. Anchor を **Middle Right**（中央右）に設定
+4. `Image Type` を **`Filled`** に変更
+5. `Fill Method` を **`Radial 360`** に変更
+6. `Fill Origin` を **`Top`** に変更
+7. `Fill Amount` を **`0`** に設定（初期値：空）
+8. `Color` を `#7A766F` に設定
+9. Inspector 上部のチェックボックスを **OFF（非表示）** にする
+
+---
 
 ### 7-4. GameHUD スクリプトへの参照アサイン
 
-`HUD` オブジェクトの `GameHUD` コンポーネントの Inspector で以下をアサイン：
+`HUD` オブジェクトの `GameHUD` コンポーネントを選択して、各フィールドに参照をドラッグします。
 
-| フィールド | アサインするもの |
+| Inspector のフィールド名 | アサインするもの | 場所 |
+|---|---|---|
+| `Tank Status` | `TankStatus` コンポーネント | `Tank` GameObject |
+| `Bullet Manager` | `TankBulletManager` コンポーネント | `Tank` GameObject |
+| `Theme` | `ThemeColor.asset` | `Assets/ProjectTanker/Data/` |
+| `Hp Fill` | `HPFill` の **Image コンポーネント** | `HUD/HPArea/HPFill` |
+| `Hp Text` | `HPText` の **TextMeshProUGUI コンポーネント** | `HUD/HPArea/HPText` |
+| `Ammo Container` | `AmmoContainer` の **Transform** | `HUD/AmmoArea/AmmoContainer` |
+| `Ammo Bullet Prefab` | `AmmoBulletPrefab` の **Image コンポーネント** | `HUD/AmmoArea/AmmoBulletPrefab` |
+| `Reload Circle` | `ReloadCircle` の **Image コンポーネント** | `HUD/AmmoArea/ReloadCircle` |
+
+> **コンポーネントをドラッグするには**: Hierarchy でオブジェクトを選択して Inspector を開き、目的のコンポーネント名（例：`Image`）の左のアイコン部分を、GameHUD の対応フィールドへドラッグします。
+
+---
+
+### 7-5. シーンを保存
+
+`Ctrl + S` でシーンを保存してください。
+
+---
+
+## 8. 動作確認・テスト手順
+
+ここからはプレイモードに入って実際の動作を確認します。  
+各項目を上から順番にテストしてください。
+
+---
+
+### 8-1. 起動時の表示確認
+
+1. Unity エディタ上部の **▶ ボタン**を押してプレイモードを開始
+2. 以下を目視確認する
+
+| 確認項目 | 期待される表示 |
 |---|---|
-| `Tank Status` | `Tank` GameObject の `TankStatus` コンポーネント |
-| `Bullet Manager` | `Tank` GameObject の `TankBulletManager` コンポーネント |
-| `Theme` | `ThemeColor.asset` |
-| `Hp Fill` | `HPFill` の `Image` コンポーネント |
-| `Hp Text` | `HPText` の `TextMeshProUGUI` コンポーネント |
-| `Ammo Container` | `AmmoContainer` の `Transform` |
-| `Ammo Bullet Prefab` | `AmmoBulletPrefab` の `Image` コンポーネント |
-| `Reload Circle` | `ReloadCircle` の `Image` コンポーネント |
+| 画面全体の背景色 | クリーム色（`#F0EDE8`）になっている |
+| 左上 | HP バーが表示されている（コーラルレッドのバー） |
+| 右下 | 弾数アイコンが `TankData` の `magazineCapacity` の数だけ横に並んでいる |
+| 画面下部中央 | 7つのスロットが横一列に表示されている |
+| 画面中央 | モジュール3択カードが表示されている |
+
+**うまくいかない場合**:  
+→ HP バーが出ない：`GameHUD` の `Hp Fill` フィールドに `HPFill` がアサインされているか確認  
+→ 弾数アイコンが出ない：`Ammo Bullet Prefab` フィールドに `AmmoBulletPrefab` の **Image** がアサインされているか確認（GameObject ではなく Image コンポーネント）
 
 ---
 
-## 8. 動作確認チェックリスト
+### 8-2. モジュール3択 UI のテスト
 
-すべての設定が完了したら、Unity でプレイモードに入って以下を確認してください。
+ゲーム開始直後に3択カードが自動表示されます（`TankPresenter` がデバッグ用に `ModuleEarn()` を呼んでいるため）。
 
-### 基本カラー
-- [ ] 画面背景がクリーム色（`#F0EDE8`）になっている
-- [ ] パネル類がグレージュ（`#E9E5DF`）になっている
+**確認手順**
 
-### モジュール3択 UI
-- [ ] ゲーム開始時に3択カードが表示される
-- [ ] カード上部に属性カラーバー（Earth=緑、Water=青、Fire=赤、Wind=黄）が表示される
-- [ ] モジュールを選ぶとパネルが閉じてインベントリに追加される
+1. プレイモード開始 → 画面中央に3枚のカードが表示されるのを確認
+2. 各カード上部に色のついたバー（AccentBar）が表示されているか確認
+   - モジュールの属性が `None` の場合はグレー（`#B0ABA3`）で表示される
+3. いずれか1枚のカードをクリックする
+   - カードパネルが閉じることを確認
+   - E キーを押してインベントリを開き、選んだモジュールが一覧に追加されていることを確認
 
-### 装備スロット
-- [ ] 画面下部に7つのスロットが表示される
-- [ ] 空スロットはアイコンが非表示（alpha=0）になっている
-- [ ] スロット左上に番号（1〜7）が表示される
-- [ ] モジュールを装備するとスロット下部の `AccentLine` に属性色が表示される
-- [ ] ドラッグ中のゴーストが半透明（70%）になっている
-
-### インベントリ UI
-- [ ] E キーでインベントリパネルが開閉する
-- [ ] 各アイテムの右端に属性カラーのドットが表示される
-- [ ] ドラッグ中のゴーストが半透明（70%）になっている
-- [ ] スロットからインベントリへドラッグ&ドロップでモジュールが戻る
-
-### HUD
-- [ ] 左上に HP バーが表示される
-- [ ] HP が減ると HP バーが縮まり、Fire（赤）→ Wind（黄）でグラデーション変化する
-- [ ] 右下に弾数分のアイコンが表示される
-- [ ] 弾を撃つと使用済みアイコンが薄色（`#CFC9C2`）に変わる
-- [ ] 弾が0になるとリロード円形プログレスが表示され、リロード完了で消える
+**確認チェック**
+- [ ] 3択カードが表示される
+- [ ] カード上部に AccentBar の色が表示される
+- [ ] クリックでパネルが閉じてインベントリに追加される
 
 ---
 
-## トラブルシューティング
+### 8-3. インベントリ UI のテスト
+
+**確認手順**
+
+1. **E キー** を押してインベントリパネルが開くことを確認
+2. 追加したモジュールのアイテム行が表示されているか確認
+   - アイコン・モジュール名・右端の属性カラードットが表示されているか確認
+3. **E キー** をもう一度押してパネルが閉じることを確認
+
+**ドラッグ&ドロップのテスト**
+
+1. E キーでインベントリを開く
+2. アイテム行をドラッグ開始 → カーソルに半透明（70%）のゴーストアイコンが追従することを確認
+3. そのまま画面下部のいずれかのスロットへドラッグしてドロップする
+   - スロットにアイコンが表示されること
+   - スロット下部の AccentLine に属性カラーが表示されること
+
+**確認チェック**
+- [ ] E キーでパネルが開閉する
+- [ ] アイテム行に属性ドットが表示される
+- [ ] ドラッグ中にゴーストが半透明で追従する
+- [ ] スロットへドロップで装備できる
+- [ ] スロットの AccentLine に属性色が出る
+
+---
+
+### 8-4. スロット → インベントリ への取り外しテスト
+
+**確認手順**
+
+1. スロットに装備済みのモジュールアイコンをドラッグ開始
+2. インベントリパネルを E キーで開いておき、そのままパネル上へドロップする
+   - スロットからモジュールが消えること
+   - インベントリにモジュールが戻ること
+
+**確認チェック**
+- [ ] スロット→インベントリへのドラッグ&ドロップで取り外せる
+
+---
+
+### 8-5. HP バーのテスト
+
+現時点で HP を手動で減らすトリガーがない場合は、スクリプトに一時的なデバッグコードを追加して確認します。
+
+**`TankPresenter.cs` の `Start()` 末尾に1行追加（デバッグ用）**
+
+```csharp
+// デバッグ: HP を半分に減らして表示を確認
+tankStatus.DealDamage(tankStatus.getMaxHP.Value / 2);
+```
+
+**確認手順**
+
+1. 上記コードを追加してプレイモードを開始
+2. HP バーが半分の長さになっているか確認
+3. バーの色が `#E07A5F`（コーラル）から `#F2CC6A`（イエロー）の中間色になっているか確認
+
+**確認後は追加したデバッグコードを必ず削除してください。**
+
+**確認チェック**
+- [ ] HP が減るとバーが縮まる
+- [ ] HP 残量でバーのグラデーション色が変わる
+- [ ] `HPText` に `現在HP / 最大HP` が表示される
+
+---
+
+### 8-6. 弾数・リロードのテスト
+
+**確認手順**
+
+1. プレイモードを開始し、右下の弾数アイコンの初期状態を確認（全アイコンが濃色）
+2. **Space キー** を押して弾を発射する
+   - 発射するたびにアイコンが右から薄色（`#CFC9C2`）に変わることを確認
+3. 弾を撃ち切る（全アイコンが薄色になる）
+   - `ReloadCircle`（円形プログレス）が表示されることを確認
+   - リロード完了とともに円が消え、アイコンが1つずつ濃色に戻ることを確認
+
+**確認チェック**
+- [ ] 発射でアイコンが薄くなる
+- [ ] 弾切れで ReloadCircle が出現する
+- [ ] リロード完了でアイコンが復活する
+- [ ] ReloadCircle がリロード進捗に合わせて塗りつぶされる
+
+---
+
+### 8-7. 全体の見た目の最終チェック
+
+プレイモードでゲームを操作しながら以下を確認します。
+
+- [ ] 背景・パネルすべてがクリーム〜グレージュの暖かいトーンに統一されている
+- [ ] 白すぎる部分、黒すぎる部分がない
+- [ ] 文字がすべて日本語フォントで表示されている（文字化け・豆腐文字がない）
+- [ ] 全体的にゲームを遊んでいて目に優しい雰囲気になっている
+
+---
+
+## 9. トラブルシューティング
 
 ### スクリプトが Inspector に表示されない
-→ コンパイルエラーがある可能性があります。Console ウィンドウ（`Ctrl+Shift+C`）でエラーを確認してください。
+Console ウィンドウ（`Ctrl+Shift+C`）でコンパイルエラーを確認してください。  
+エラーがなければ Unity のコンパイルが終わるまで数秒待ってから再試行します。
 
 ### ThemeColor が Create メニューに出ない
-→ Unity がスクリプトをまだコンパイルしていません。Console にエラーがなければ少し待ってから再試行してください。
+スクリプトがまだコンパイルされていない状態です。Console にエラーがなければ少し待ってから再試行してください。
 
-### ドラッグ&ドロップが動かない
-→ Canvas の `Event System` が Hierarchy に存在するか確認してください。ない場合は `GameObject > UI > Event System` で追加します。
+### HP バーが表示されない・動かない
+- `GameHUD` の `Hp Fill` フィールドに `HPFill` オブジェクトの **Image コンポーネント** がアサインされているか確認
+- `HPFill` の `Image Type` が **Filled** / `Fill Method` が **Horizontal** になっているか確認
 
-### フォントが文字化けする
-→ TextMeshPro のフォントアセットに日本語グリフが含まれていない可能性があります。Font Asset Creator で Character Set を `Unicode Range (Hex)` にして `3000-9FFF` の範囲を追加して再生成してください。
+### 弾数アイコンが出ない
+- `Ammo Bullet Prefab` フィールドに `AmmoBulletPrefab` の **Image コンポーネント** がアサインされているか確認（GameObjectごとではなくコンポーネント単位でドラッグ）
+- `AmmoBulletPrefab` が非表示（チェックOFF）になっているか確認
+
+### ReloadCircle が出ない・円にならない
+- `Image Type` が **Filled**、`Fill Method` が **Radial 360** になっているか確認
+- Sprite に**円形のスプライト**が設定されているか確認（四角のスプライトでは円に見えません）
+
+### ドラッグ&ドロップが反応しない
+- Hierarchy に `EventSystem` が存在するか確認  
+  ない場合: `GameObject > UI > Event System` で追加
+- ドラッグ元・ドロップ先の GameObject に `Raycast Target` が ON になっているか確認
+
+### 属性カラー（AccentBar / AccentLine / ElementDot）が表示されない
+- 各スクリプトの Inspector で `Theme` フィールドに `ThemeColor.asset` がアサインされているか確認
+- モジュールの `moduleElement` が `None` に設定されている場合はグレー（`#B0ABA3`）で表示されます（正常な動作です）
+
+### フォントが豆腐文字（□）になる
+- `Edit > Project Settings > TextMesh Pro` の `Default Font Asset` に日本語対応の Font Asset が設定されているか確認
+- Dynamic モードの Font Asset を使っている場合、エディタ上では初回表示時に一瞬豆腐になることがあります。プレイモードを再起動すると解消します。
