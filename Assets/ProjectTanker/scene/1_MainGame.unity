@@ -318,10 +318,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Type: 2
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 4
+  m_FillMethod: 0
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
@@ -3663,8 +3663,8 @@ MonoBehaviour:
   tankStatus: {fileID: 781938003}
   bulletManager: {fileID: 781938002}
   theme: {fileID: 11400000, guid: 1508c11942f7a5b48a1ec4a383dbd9cb, type: 2}
-  hpFill: {fileID: 0}
-  hpText: {fileID: 0}
+  hpFill: {fileID: 34318909}
+  hpText: {fileID: 665481597}
   ammoContainer: {fileID: 0}
   ammoBulletPrefab: {fileID: 0}
   reloadCircle: {fileID: 0}
