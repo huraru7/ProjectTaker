@@ -11,7 +11,7 @@ public class Bullet : MonoBehaviour
     private float _currentLifeTime;
     private Rigidbody2D _rb;
     private Vector2 _direction;
-    private TankBulletManager _owner;
+    private BulletManagerBase _owner;
 
     void Awake()
     {
@@ -24,7 +24,7 @@ public class Bullet : MonoBehaviour
     /// <param name="direction">発射方向</param>
     /// <param name="owner">この弾を発射したタンクのBulletManager</param>
     /// <param name="speed">弾速</param>
-    public void Initialize(Vector2 direction, TankBulletManager owner, float speed)
+    public void Initialize(Vector2 direction, BulletManagerBase owner, float speed)
     {
         this.speed = speed;
         _owner = owner;
@@ -57,7 +57,7 @@ public class Bullet : MonoBehaviour
             return;
         }
 
-        if (collision.gameObject.TryGetComponent<TankBulletManager>(out var bulletManager))
+        if (collision.gameObject.TryGetComponent<BulletManagerBase>(out var bulletManager))
         {
             bulletManager.TakeDamage(damage);
             if (_owner != null) _owner.ReturnBullet(this);

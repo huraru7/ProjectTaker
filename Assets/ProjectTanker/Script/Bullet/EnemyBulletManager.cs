@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using R3;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-public class TankBulletManager : BulletManagerBase
+public class EnemyBulletManager : BulletManagerBase
 {
     [Header("TankStatus")]
     [SerializeField] private TankStatus _tankStatus;
@@ -14,7 +13,6 @@ public class TankBulletManager : BulletManagerBase
     [SerializeField] private SerializableReactiveProperty<int> totalRounds;
     public SerializableReactiveProperty<int> getTotalRounds => totalRounds;
 
-    // リロード進捗 0–1（弾が満タンのときは 0）
     public float ReloadProgress => _tankStatus != null && totalRounds.Value < _tankStatus.getMagazineCapacity.Value
         ? Mathf.Clamp01(currentTime / _tankStatus.getReloadTime.Value)
         : 0f;
@@ -37,13 +35,6 @@ public class TankBulletManager : BulletManagerBase
     void Start()
     {
         totalRounds.Value = _tankStatus.getMagazineCapacity.Value;
-        Debug.Log($"初期弾数: {totalRounds.Value}");
-    }
-
-    public override void TakeDamage(int damage)
-    {
-        _tankStatus.DealDamage(damage);
-        //do:ダメージ演出や効果音はここから呼び出せる。
     }
 
     private float currentTime = 0f;
@@ -52,28 +43,32 @@ public class TankBulletManager : BulletManagerBase
     {
         if (totalRounds.Value < _tankStatus.getMagazineCapacity.Value)
         {
-            //リロード処理
             currentTime += Time.deltaTime;
-
             if (currentTime > _tankStatus.getReloadTime.Value)
             {
                 totalRounds.Value++;
                 currentTime = 0f;
-                Debug.Log($"りろーど 弾残量{totalRounds.Value}");
             }
-        }
-
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
-        {
-            Fire();
-            Debug.Log($"弾残量{totalRounds.Value}");
         }
     }
 
-    /// <summary>
-    /// 弾の召喚
-    /// </summary>
-    /// <param name="direction">発射方向</param>
+    public override void TakeDamage(int damage)
+    {
+        _tankStatus.DealDamage(damage);
+    }
+
+    public override void Fire()
+    {
+        if (isShoot && totalRounds.Value >= 1)
+            SpawnBullet(transform.up);
+    }
+
+    public void FireInDirection(Vector2 direction)
+    {
+        if (isShoot && totalRounds.Value >= 1)
+            SpawnBullet(direction);
+    }
+
     public void SpawnBullet(Vector2 direction)
     {
         Bullet b;
@@ -93,15 +88,6 @@ public class TankBulletManager : BulletManagerBase
         totalRounds.Value--;
     }
 
-    public override void Fire()
-    {
-        if (isShoot && totalRounds.Value >= 1)
-            SpawnBullet(transform.up);
-    }
-
-    /// <summary>
-    /// 弾をプールに返却する
-    /// </summary>
     public override void ReturnBullet(Bullet b)
     {
         b.gameObject.SetActive(false);

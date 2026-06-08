@@ -1,6 +1,6 @@
-# Unity エディタ作業ガイド — インベントリ廃止・装備スロット一本化
+# Unity エディタ作業ガイド — Enemy System セットアップ
 
-> コード側の変更（STEP 1）は完了済み。このファイルの手順に沿って Unity エディタ側を整理してください。
+> コード側の変更（スクリプト実装）が完了してから、このガイドに沿って Unity エディタ側を整理してください。
 
 ---
 
@@ -22,254 +22,153 @@ None         #B0ABA3
 
 ---
 
-# STEP 1 — インベントリ関連オブジェクトの削除
+# STEP 1 — Enemy 用 TankData ScriptableObject の作成
 
-## 1-1. コンパイルエラーの確認
+## 1-1. TankData アセットを複製する
 
-Unity がスクリプト変更を検知して自動リコンパイルします。
+1. Project ウィンドウで `Assets/ProjectTanker/Data/TankData.asset` を選択
+2. `Ctrl+D` で複製 → 名前を **`EnemyTankData`** に変更
+3. Inspector を開き、適宜ステータスを調整する（HP、移動速度など）
 
-1. `Window > General > Console`（`Ctrl+Shift+C`）を開く
-2. **赤いエラーが 0 件**になるまで待つ
-
-> エラーが残っている場合は次の作業に進まないでください。
-
----
-
-## 1-2. シーンから ModuleInventory を削除
-
-`1_MainGame.unity` を開いた状態で行います。
-
-1. Hierarchy ウィンドウで **`Canvas`** の左の三角を展開する
-2. `Canvas` 以下に **`ModuleInventory`**（または `InventoryUI` という名前）のオブジェクトを探す
-3. 見つけたらクリックして選択 → **`Delete` キー** で削除
-4. Hierarchy から消えたことを確認
-
-> 名前が違う場合は Inspector で `InventoryUI` スクリプトがついているオブジェクトを探してください。
+> プレイヤーと同じ値でも構いません。後から調整可能です。
 
 ---
 
-## 1-3. TankPresenter の Inspector を確認・整理
+# STEP 2 — Enemy GameObject の作成
 
-1. Hierarchy で **`Canvas`** または **`TankPresenter`** がアタッチされているオブジェクトを選択
-2. Inspector の `TankPresenter` コンポーネントを確認する
-3. 以下のフィールドが**残っていないこと**を確認する
-   - `Inventory UI` フィールド（スクリプト変更により自動で消えているはず）
-4. もし `None (Inventory UI)` のような欄が残っていたら、スクリプトのリコンパイルが完了していない可能性があります。Console のエラーを確認してください。
+## 2-1. 既存プレイヤー Prefab を参考に Enemy を作る
 
-**現在残っているべきフィールド（View セクション）:**
+1. Hierarchy でプレイヤーの Tank オブジェクト（Rigidbody2D、TankStatus が付いているもの）を確認する
+2. Hierarchy を右クリック → **`Create Empty`**、名前を **`EnemyTank`** に変更
+3. プレイヤーと同じ見た目の Sprite（SpriteRenderer）を子オブジェクトとして追加する（色を変えて識別しやすくする）
 
-| フィールド名 | アサインされているもの |
+---
+
+## 2-2. 必要なコンポーネントをアタッチする
+
+`EnemyTank` オブジェクトを選択し、`Add Component` から以下を順番に追加する。
+
+| コンポーネント | 説明 |
 |---|---|
-| `Get Module Select UI` | モジュール3択パネルの GameObject |
-| `Slot UI` | スロットUIの GameObject |
+| `Rigidbody2D` | 物理移動に必要。Gravity Scale を **0** に設定（2Dトップダウン） |
+| `Collider2D`（Polygon または Circle） | 衝突判定。プレイヤーと同じ形状を推奨 |
+| `TankStatus` | ステータス管理（プレイヤーと共用） |
+| `EnemyBulletManager` | 弾の発射・プール管理（Enemy専用） |
+| `EnemyMovement` | AI命令を受けて移動する |
+| `EnemyManager` | AI戦略とコンポーネントの橋渡し |
 
 ---
 
-## 1-4. ModuleInventoryPanel Prefab の確認
+## 2-3. TankStatus の Inspector をアサイン
 
-`InventoryItemUI.cs` は削除しましたが、Prefab ファイル自体はまだ残っています。
+`EnemyTank` の `TankStatus` コンポーネントに以下をアサイン:
 
-1. Project ウィンドウで `Assets/ProjectTanker/Prefab/ModuleInventoryPanel.prefab` を探す
-2. Prefab を選択して Inspector を開く
-3. **Missing Script** の警告（黄色または赤）が出ていたら以下を行う：
-   - Prefab をダブルクリックして開く
-   - Missing Script がついているコンポーネントの右の `⋮` メニュー → `Remove Component` で削除
-   - `Ctrl+S` で Prefab を保存して閉じる
-4. この Prefab はもう使わないため、削除してもかまいません
-   - Project ウィンドウで右クリック → `Delete`
-
----
-
-## 1-5. SlotItemUI の Inspector 確認（7つ分）
-
-ドラッグ&ドロップ関連の Script を撤去したため、SlotItem の Inspector が変わっています。
-
-1. Hierarchy で `Canvas > Slot` を展開する
-2. `SlotItem` × 7 を順番に選択し、Inspector の `SlotItemUI` コンポーネントを確認する
-3. 以下のフィールドが残っていること（アサインが外れていないか）を確認する
-
-| フィールド | 内容 |
+| フィールド | アサインするもの |
 |---|---|
-| `Icon Image` | アイコン表示用 Image |
-| `Name Text` | モジュール名 TextMeshProUGUI |
-| `Accent Line` | 属性カラーライン Image |
-| `Slot Number` | スロット番号 TextMeshProUGUI |
-| `Theme` | ThemeColor アセット |
-
-> ドラッグ&ドロップ関連のフィールド（`On Drop` など）は消えているはずです。正常です。
+| `Data` | `EnemyTankData`（STEP 1 で作成したもの） |
 
 ---
 
-## 1-6. EventSystem の確認
+## 2-4. EnemyBulletManager の Inspector をアサイン
 
-Hierarchy に `EventSystem` が残っていることを確認します。  
-削除してしまうとボタンクリックが一切効かなくなります。
+`EnemyBulletManager` コンポーネントに以下をアサイン:
 
-1. Hierarchy で `EventSystem` を探す
-2. **存在していれば OK**（何もしない）
-3. なければ `GameObject > UI > Event System` で追加する
+| フィールド | アサインするもの |
+|---|---|
+| `Tank Status` | `EnemyTank` の `TankStatus` コンポーネント |
+| `Bullet` | 弾の Prefab（プレイヤーと同じもので可） |
+| `Bullet Parent` | 弾を格納する空 GameObject（`BulletPool` などの名前を付けて作成） |
+| `Pool Size` | 5（デフォルト） |
+| `Is Shoot` | ✅ ON |
+
+> `BulletPool` オブジェクトは Hierarchy に空の GameObject として作成し、`EnemyTank` の子にしておくと管理しやすい。
 
 ---
 
-## 1-7. シーンを保存
+## 2-5. EnemyMovement の Inspector をアサイン
+
+| フィールド | アサインするもの |
+|---|---|
+| `Tank Status` | `EnemyTank` の `TankStatus` コンポーネント |
+
+> `Rigidbody2D` は `[RequireComponent]` によって自動で取得されます。
+
+---
+
+## 2-6. EnemyManager の Inspector をアサイン
+
+| フィールド | アサインするもの |
+|---|---|
+| `Tank Status` | `EnemyTank` の `TankStatus` コンポーネント |
+| `Movement` | `EnemyTank` の `EnemyMovement` コンポーネント |
+| `Bullet Manager` | `EnemyTank` の `EnemyBulletManager` コンポーネント |
+| `Player Transform` | シーン内のプレイヤー Tank オブジェクト |
+
+### AI の選択（Strategyパターン）
+
+1. `EnemyManager` コンポーネントの **`Ai`** フィールドを右クリック（または横の `+` ボタン）
+2. 表示されるメニューから **`ChaseAndFireAI`** を選択
+3. 以下のパラメータが展開されるので設定する:
+
+| パラメータ | 推奨値 | 説明 |
+|---|---|---|
+| `Detection Range` | `10` | この距離以内でプレイヤーを追跡開始 |
+| `Attack Range` | `5` | この距離以内でプレイヤーを攻撃 |
+| `Fire Angle Threshold` | `15` | 正面からこの角度（度）以内で射撃 |
+
+> 後でボスAIなど別のAIに差し替えたい場合は、`Ai` フィールドを右クリック → `Change Type` で変更できます。コンポーネントへの変更は不要です。
+
+---
+
+# STEP 3 — Rigidbody2D の設定確認
+
+`EnemyTank` の `Rigidbody2D` を選択し、以下の設定を確認する。
+
+| 設定項目 | 値 |
+|---|---|
+| Body Type | `Dynamic` |
+| Gravity Scale | `0`（トップダウン2D） |
+| Freeze Rotation Z | ✅ ON（物理回転は無効、スクリプトで制御） |
+
+---
+
+# STEP 4 — シーンを保存
 
 `Ctrl + S` でシーンを保存します。
 
 ---
 
-## 1-8. 動作確認（プレイモード）
+# STEP 5 — 動作確認（プレイモード）
 
 `▶` でプレイモードを開始し、以下をすべて確認してください。
 
 | 確認項目 | 期待する結果 |
 |---|---|
 | Console にエラーが出ない | ✅ |
-| ゲーム開始時に3択カードが表示される | ✅ |
-| カードを選択する | 最初の空きスロットに自動装備される ✅ |
-| 7スロット全部が埋まった状態でカードを選択 | 何も起きない（エラーなし）✅ |
-| E キーを押してもインベントリが開かない | ✅（削除済みのため） |
-
----
-
-# STEP 2 — ModuleReplaceUI の作成（スロット満杯時の入れ替え/破棄）
-
-STEP 1 の動作確認が完了してから進めてください。
-
----
-
-## 2-1. ModuleReplacePanel オブジェクトの作成
-
-1. Hierarchy で **`Canvas`** を右クリック → `Create Empty`
-2. 名前を **`ModuleReplacePanel`** に変更
-3. `ModuleReplaceUI` スクリプトをアタッチ（Inspector の `Add Component` から検索）
-
----
-
-## 2-2. パネルの構成を組む
-
-`ModuleReplacePanel` 以下に以下の構造を作ります。
-
-```
-ModuleReplacePanel
-└── Panel                      Image（背景、Color: #E9E5DF）
-    ├── NewModuleArea          空 GameObject（取得モジュール表示エリア）
-    │   ├── NewModuleIcon      Image（取得したモジュールのアイコン）
-    │   └── NewModuleName      TextMeshProUGUI（モジュール名）
-    ├── Label                  TextMeshProUGUI（「どうしますか？」など）
-    ├── SlotButtons            空 GameObject（スロット選択ボタンの親）
-    │   └── SlotOptionButton × 7   ModuleOptionButton コンポーネントつき
-    └── DiscardButton          Button（「破棄する」テキスト付き）
-```
-
-### Panel の設定
-
-- Anchor: **Stretch / Stretch**（画面全体を薄く覆う半透明背景）または **Middle/Center** で中央固定パネル
-- Color: `#E9E5DF`、Alpha: `220`（約86%）
-- Width/Height を中央固定にする場合: 例 Width `500`、Height `400`
-
-### NewModuleIcon
-
-- サイズ: 64×64
-- Sprite: 実行時にスクリプトがセットするので空白でOK
-
-### NewModuleName
-
-- フォントサイズ: 16
-- Color: `#3D3833`
-- Alignment: Center
-
-### SlotButtons の設定
-
-- `Vertical Layout Group` コンポーネントを追加
-  - Spacing: `8`
-  - Child Force Expand Width: ON、Height: OFF
-
-### SlotOptionButton × 7 の作成
-
-既存の `ModuleOptionButton` Prefab を複製するか、新たに以下の構成で7つ作ります:
-
-```
-SlotOptionButton  （Button コンポーネント + ModuleOptionButton スクリプト）
-├── AccentBar     Image（属性カラーバー）
-├── IconImage     Image（スロットのモジュールアイコン）
-└── NameText      TextMeshProUGUI（スロットのモジュール名）
-```
-
-各 `SlotOptionButton` の `ModuleOptionButton` コンポーネントに以下をアサイン:
-- `Button` → 自身の Button コンポーネント
-- `Icon Image` → `IconImage`
-- `Name Text` → `NameText`
-- `Accent Bar` → `AccentBar`
-- `Theme` → `ThemeColor.asset`
-
-### DiscardButton の設定
-
-- Button コンポーネントつきの GameObject
-- 子に TextMeshProUGUI で「破棄する」のテキスト
-- Color: `#DDD8D1`（通常）、Highlighted: `#B5AFA7`
-
----
-
-## 2-3. パネルを初期非表示にする
-
-`ModuleReplacePanel` 以下の **`Panel`** オブジェクトを選択し、Inspector 上部のチェックを **OFF（非表示）** にする。
-
-> `ModuleReplaceUI.cs` の `panel` フィールドにはこの `Panel` を指定します（ルートの `ModuleReplacePanel` ではなく）。
-
----
-
-## 2-4. ModuleReplaceUI の Inspector をアサイン
-
-`ModuleReplacePanel` の `ModuleReplaceUI` コンポーネントに以下をアサイン:
-
-| フィールド | アサインするもの |
-|---|---|
-| `Panel` | `Panel` オブジェクト（非表示にしたもの） |
-| `New Module Icon` | `NewModuleIcon` の Image コンポーネント |
-| `New Module Name` | `NewModuleName` の TextMeshProUGUI |
-| `Slot Option Buttons` (配列 × 7) | `SlotOptionButton` × 7 の ModuleOptionButton コンポーネント |
-| `Discard Button` | `DiscardButton` の Button コンポーネント |
-
----
-
-## 2-5. TankPresenter の Inspector に追加
-
-1. `TankPresenter` がアタッチされているオブジェクトを選択
-2. Inspector の `TankPresenter` コンポーネントを確認
-3. **`Module Replace UI`** フィールドに `ModuleReplacePanel` の **`ModuleReplaceUI` コンポーネント** をドラッグ
-
----
-
-## 2-6. シーンを保存
-
-`Ctrl + S` でシーンを保存します。
-
----
-
-## 2-7. 動作確認（プレイモード）
-
-| 確認項目 | 期待する結果 |
-|---|---|
-| スロット7つが埋まった状態でカードを選択 | `ModuleReplaceUI` が表示される ✅ |
-| 「破棄する」ボタンを押す | パネルが閉じ、スロットに変化なし ✅ |
-| スロットボタンのいずれかを押す | そのスロットが新モジュールに入れ替わる ✅ |
-| 入れ替え後パネルが閉じる | 通常プレイに戻る ✅ |
-| Console にエラーが出ない | ✅ |
+| Enemy がプレイヤー方向に向いて移動する | ✅ |
+| Enemy がプレイヤーの射程内で弾を発射する | ✅ |
+| プレイヤーの弾が Enemy に当たりダメージが入る | ✅ |
+| Enemy の弾がプレイヤーに当たりダメージが入る | ✅ |
+| Enemy の HP が 0 になる | ✅（死亡処理は別途実装） |
 
 ---
 
 ## トラブルシューティング
 
-### Missing Script の警告が出る
-→ 削除したスクリプト（InventoryUI / InventoryItemUI）がまだどこかの GameObject にアタッチされています。  
-Hierarchy を検索（`Ctrl+F`）して該当オブジェクトを見つけ、`Remove Component` で削除してください。
+### Enemy が動かない
+→ `EnemyManager` の `Player Transform` フィールドにプレイヤーがアサインされているか確認してください。  
+→ `EnemyMovement` の `TankStatus` が正しくアサインされているか確認してください。
 
-### スロットに自動装備されない
-→ `TankPresenter` の `Slot UI` フィールドに SlotUI がアサインされているか確認してください。
+### Enemy が射撃しない
+→ `EnemyBulletManager` の `Is Shoot` が ON になっているか確認してください。  
+→ `EnemyBulletManager` の `Bullet` Prefab がアサインされているか確認してください。
 
-### ModuleReplaceUI が表示されない（スロット満杯時）
-→ `TankPresenter` の `Module Replace UI` フィールドに ModuleReplaceUI がアサインされているか確認してください。  
-→ `Panel` の初期状態が非表示（チェック OFF）になっているか確認してください。
+### プレイヤーの弾が Enemy に当たらない
+→ `EnemyTank` に `Collider2D` が付いているか確認してください。  
+→ `EnemyBulletManager` コンポーネントが `EnemyTank` にアタッチされているか確認してください（弾の衝突判定は `BulletManagerBase` を継承したコンポーネントを検索するため）。
 
-### ボタンを押しても反応しない
-→ Hierarchy に `EventSystem` が存在するか確認してください。
+### ChaseAndFireAI が Inspector で選択できない
+→ Unity エディタを再起動してスクリプトの再コンパイルを待ってください。
+
+### Enemy が回転しない・回転がおかしい
+→ `Rigidbody2D` の `Freeze Rotation Z` が ON になっているか確認してください（ON が正しい。物理で回転させず、スクリプトで制御します）。
