@@ -6793,16 +6793,20 @@ MonoBehaviour:
   _bulletManager: {fileID: 992143136}
   _playerTransform: {fileID: 781937999}
   _ai:
-    rid: 2073838551973232714
+    rid: 2073838573689503816
   references:
     version: 2
     RefIds:
-    - rid: 2073838551973232714
-      type: {class: ChaseAndFireAI, ns: , asm: Assembly-CSharp}
+    - rid: 2073838573689503816
+      type: {class: ExpertAI, ns: , asm: Assembly-CSharp}
       data:
-        detectionRange: 10
-        attackRange: 5
-        fireAngleThreshold: 15
+        detectionRange: 14
+        preferredDistance: 6
+        margin: 1.5
+        predictionTime: 0.4
+        fireAngleThreshold: 12
+        bounceAngleTolerance: 10
+        bounceCheckInterval: 0.5
 --- !u!114 &992143138
 MonoBehaviour:
   m_ObjectHideFlags: 0
