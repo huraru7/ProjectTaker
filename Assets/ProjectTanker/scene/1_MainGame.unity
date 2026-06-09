@@ -6827,6 +6827,7 @@ MonoBehaviour:
         fireAngleThreshold: 12
         bounceAngleTolerance: 10
         bounceCheckInterval: 0.5
+        difficulty: 51
 --- !u!114 &992143138
 MonoBehaviour:
   m_ObjectHideFlags: 0
