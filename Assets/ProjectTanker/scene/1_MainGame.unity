@@ -5266,6 +5266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 5
   turnRate: 2
+  _barrel: {fileID: 2135295774}
   _tankStatus: {fileID: 781938003}
 --- !u!50 &781938001
 Rigidbody2D:
@@ -5307,6 +5308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankBulletManager
   _tankStatus: {fileID: 781938003}
+  _barrel: {fileID: 2135295774}
   bullet: {fileID: 2616927210013429467, guid: 4474e47b53d314527aff31f9cc9853a3, type: 3}
   isShoot: 1
   totalRounds:
@@ -5341,6 +5343,8 @@ MonoBehaviour:
   magazineCapacity:
     value: 0
   reloadTime:
+    value: 0
+  barrelTurnRate:
     value: 0
 --- !u!114 &781938004
 MonoBehaviour:
@@ -6348,6 +6352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 946205064}
   - component: {fileID: 946205065}
+  - component: {fileID: 946205066}
   m_Layer: 0
   m_Name: tank_barrel
   m_TagString: Untagged
@@ -6429,6 +6434,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &946205066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 946205063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0758985f9f5af034e9ac4772401d8be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarrelController
+  _muzzleOffset: 1
 --- !u!1 &970185179
 GameObject:
   m_ObjectHideFlags: 0
@@ -6770,6 +6788,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyBulletManager
   _tankStatus: {fileID: 992143139}
+  _barrel: {fileID: 946205066}
   bullet: {fileID: 2616927210013429467, guid: 4474e47b53d314527aff31f9cc9853a3, type: 3}
   isShoot: 1
   totalRounds:
@@ -6791,6 +6810,7 @@ MonoBehaviour:
   _tankStatus: {fileID: 992143139}
   _movement: {fileID: 992143138}
   _bulletManager: {fileID: 992143136}
+  _barrel: {fileID: 946205066}
   _playerTransform: {fileID: 781937999}
   _ai:
     rid: 2073838573689503816
@@ -6848,6 +6868,8 @@ MonoBehaviour:
   magazineCapacity:
     value: 0
   reloadTime:
+    value: 0
+  barrelTurnRate:
     value: 0
 --- !u!1 &998692929
 GameObject:
@@ -12348,6 +12370,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2135295772}
   - component: {fileID: 2135295773}
+  - component: {fileID: 2135295774}
   m_Layer: 0
   m_Name: tank_barrel
   m_TagString: Untagged
@@ -12429,6 +12452,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &2135295774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2135295771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0758985f9f5af034e9ac4772401d8be9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarrelController
+  _muzzleOffset: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

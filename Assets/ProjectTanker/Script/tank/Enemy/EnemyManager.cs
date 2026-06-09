@@ -7,6 +7,9 @@ public class EnemyManager : MonoBehaviour
     [SerializeField] private EnemyMovement _movement;
     [SerializeField] private EnemyBulletManager _bulletManager;
 
+    [Header("Barrel")]
+    [SerializeField] private BarrelController _barrel;
+
     [Header("Target")]
     [SerializeField] private Transform _playerTransform;
 
@@ -41,4 +44,10 @@ public class EnemyManager : MonoBehaviour
     {
         _bulletManager.FireInDirection(direction);
     }
+
+    // AI がバレルを向ける際に呼ぶメソッド（Stage 2 で各 AI から使用）
+    public void AimBarrel(Vector2 worldDir) => _barrel.RotateToward(worldDir, _tankStatus.getBarrelTurnRate.Value);
+
+    // バレルの向き（Stage 2 の AI 角度判定で使用）
+    public Vector2 BarrelAimDirection => _barrel.AimDirection;
 }

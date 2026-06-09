@@ -10,9 +10,9 @@ public class TankMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float turnRate = 2f;
 
-    // [Header("Tank")]
-    // [SerializeField] private GameObject tankBarrel;
-    //これ使う？　↑
+    [Header("Barrel")]
+    [SerializeField] private BarrelController _barrel;
+    private float _barrelTurnRate;
 
     [SerializeField] private TankStatus _tankStatus;
 
@@ -27,9 +27,11 @@ public class TankMovement : MonoBehaviour
     {
         moveSpeed = _tankStatus.getMovementSpeed.Value;
         turnRate = _tankStatus.getTurnRate.Value;
+        _barrelTurnRate = _tankStatus.getBarrelTurnRate.Value;
 
         _tankStatus.getMovementSpeed.Subscribe(v => moveSpeed = v).AddTo(this);
         _tankStatus.getTurnRate.Subscribe(v => turnRate = v).AddTo(this);
+        _tankStatus.getBarrelTurnRate.Subscribe(v => _barrelTurnRate = v).AddTo(this);
     }
     private void Update()
     {
@@ -38,6 +40,10 @@ public class TankMovement : MonoBehaviour
             (kb.dKey.isPressed ? 1 : 0) - (kb.aKey.isPressed ? 1 : 0),
             (kb.wKey.isPressed ? 1 : 0) - (kb.sKey.isPressed ? 1 : 0)
         );
+
+        float barrelInput = (kb.upArrowKey.isPressed ? 1f : 0f) - (kb.downArrowKey.isPressed ? 1f : 0f);
+        if (barrelInput != 0f)
+            _barrel.RotateDelta(barrelInput * _barrelTurnRate * Time.deltaTime);
     }
     private void FixedUpdate()
     {

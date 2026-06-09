@@ -8,6 +8,9 @@ public class TankBulletManager : BulletManagerBase
     [Header("TankStatus")]
     [SerializeField] private TankStatus _tankStatus;
 
+    [Header("Barrel")]
+    [SerializeField] private BarrelController _barrel;
+
     [Header("Setting")]
     [SerializeField] private GameObject bullet;
     [SerializeField] private bool isShoot = true;
@@ -83,11 +86,11 @@ public class TankBulletManager : BulletManagerBase
         }
         else
         {
-            var obj = Instantiate(bullet, transform.position, Quaternion.identity, _bulletParent);
+            var obj = Instantiate(bullet, _barrel.MuzzlePosition, Quaternion.identity, _bulletParent);
             b = obj.GetComponent<Bullet>();
         }
 
-        b.transform.position = transform.position;
+        b.transform.position = _barrel.MuzzlePosition;
         b.gameObject.SetActive(true);
         b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value);
         totalRounds.Value--;
@@ -96,7 +99,7 @@ public class TankBulletManager : BulletManagerBase
     public override void Fire()
     {
         if (isShoot && totalRounds.Value >= 1)
-            SpawnBullet(transform.up);
+            SpawnBullet(_barrel.AimDirection);
     }
 
     /// <summary>

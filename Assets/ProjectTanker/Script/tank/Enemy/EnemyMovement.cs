@@ -34,6 +34,8 @@ public class EnemyMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        _rb.angularVelocity = 0f;
+
         if (_moveInput != Vector2.zero)
         {
             Quaternion rot = Quaternion.Euler(0f, 0f, -90f + Mathf.Atan2(_moveInput.y, _moveInput.x) * Mathf.Rad2Deg);

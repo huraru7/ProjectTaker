@@ -16,6 +16,7 @@ public class TankStatus : MonoBehaviour
     [SerializeField] private SerializableReactiveProperty<float> bulletSpeed;
     [SerializeField] private SerializableReactiveProperty<int> magazineCapacity;
     [SerializeField] private SerializableReactiveProperty<float> reloadTime;
+    [SerializeField] private SerializableReactiveProperty<float> barrelTurnRate;
 
     public SerializableReactiveProperty<int> getHP => HP;
     public SerializableReactiveProperty<int> getMaxHP => maxHP;
@@ -25,6 +26,7 @@ public class TankStatus : MonoBehaviour
     public SerializableReactiveProperty<int> getTurnRate => turnRate;
     public SerializableReactiveProperty<float> getBulletSpeed => bulletSpeed;
     public SerializableReactiveProperty<float> getReloadTime => reloadTime;
+    public SerializableReactiveProperty<float> getBarrelTurnRate => barrelTurnRate;
 
     void Awake()
     {
@@ -42,6 +44,7 @@ public class TankStatus : MonoBehaviour
         bulletSpeed = new(data.bulletSpeed);
         magazineCapacity = new(data.magazineCapacity);
         reloadTime = new(data.reloadTime);
+        barrelTurnRate = new(data.barrelTurnRate);
     }
 
     /// <summary>
@@ -57,6 +60,7 @@ public class TankStatus : MonoBehaviour
         bulletSpeed.Value = data.bulletSpeed;
         magazineCapacity.Value = data.magazineCapacity;
         reloadTime.Value = data.reloadTime;
+        barrelTurnRate.Value = data.barrelTurnRate;
     }
 
     /// <summary>
@@ -71,6 +75,7 @@ public class TankStatus : MonoBehaviour
         bulletSpeed.Value = data.bulletSpeed;
         magazineCapacity.Value = data.magazineCapacity;
         reloadTime.Value = data.reloadTime;
+        barrelTurnRate.Value = data.barrelTurnRate;
     }
 
     public void DealDamage(int amount)
