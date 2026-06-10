@@ -2,23 +2,26 @@ Shader "Custom/Outline"
 {
     Properties
     {
-        _OutlineColor ("Outline Color", Color) = (0.1, 0.1, 0.1, 1)
-        _OutlineWidth ("Outline Width", Range(0.0, 0.1)) = 0.025
+        _MainTex      ("Sprite Texture",  2D)    = "white" {}
+        _OutlineColor ("Outline Color",   Color) = (0.1, 0.1, 0.1, 1)
     }
 
     SubShader
     {
         Tags
         {
-            "RenderType"     = "Opaque"
+            "RenderType"     = "Transparent"
+            "Queue"          = "Transparent"
             "RenderPipeline" = "UniversalPipeline"
         }
 
-        // アウトライン専用パス（法線反転・背面描画）
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
+        Cull Off
+
         Pass
         {
             Name "Outline"
-            Cull Front
 
             HLSLPROGRAM
             #pragma vertex   vert
@@ -26,36 +29,47 @@ Shader "Custom/Outline"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
+                float4 _MainTex_ST;
                 float4 _OutlineColor;
-                float  _OutlineWidth;
             CBUFFER_END
+
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float3 normalOS   : NORMAL;
+                float2 uv         : TEXCOORD0;
+                float4 color      : COLOR;  // SpriteRenderer.color
             };
 
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
+                float2 uv          : TEXCOORD0;
+                float4 color       : COLOR;
             };
 
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
-                float3 expandedPos = IN.positionOS.xyz + IN.normalOS * _OutlineWidth;
-                OUT.positionHCS    = TransformObjectToHClip(expandedPos);
+                OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv          = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.color       = IN.color;
                 return OUT;
             }
 
             half4 frag(Varyings IN) : SV_Target
             {
-                return _OutlineColor;
+                // スプライトの不透明領域をそのままアウトライン色で塗る。
+                // 親より少しスケールを大きくした子オブジェクトに適用することで
+                // アウトラインとして機能する（2D 法線押し出しの代替）。
+                float alpha = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv).a;
+                return half4(_OutlineColor.rgb, _OutlineColor.a * alpha * IN.color.a);
             }
             ENDHLSL
         }
     }
 
-    FallBack "Hidden/Universal Render Pipeline/FallbackError"
+    FallBack "Sprites/Default"
 }

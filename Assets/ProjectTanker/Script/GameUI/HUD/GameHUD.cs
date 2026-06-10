@@ -1,3 +1,5 @@
+using LitMotion;
+using LitMotion.Extensions;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -14,6 +16,7 @@ public class GameHUD : MonoBehaviour
     [Header("HP")]
     [SerializeField] private Image hpFill;
     [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private RectTransform _hpBarRoot;
 
     [Header("弾数")]
     [SerializeField] private Transform ammoContainer;      // 弾アイコンを並べる親
@@ -21,11 +24,19 @@ public class GameHUD : MonoBehaviour
     [SerializeField] private Image reloadCircle;           // リロード中の円形プログレス
 
     private Image[] _ammoIcons;
+    private int _lastHP;
 
     void Start()
     {
-        // HP変化を購読
-        tankStatus.getHP.Subscribe(hp => RefreshHP(hp, tankStatus.getMaxHP.Value)).AddTo(this);
+        _lastHP = tankStatus.getHP.Value;
+
+        // HP変化を購読（減少時にシェイク演出を追加）
+        tankStatus.getHP.Subscribe(hp =>
+        {
+            if (hp < _lastHP) ShakeHPBar();
+            _lastHP = hp;
+            RefreshHP(hp, tankStatus.getMaxHP.Value);
+        }).AddTo(this);
         tankStatus.getMaxHP.Subscribe(max => RefreshHP(tankStatus.getHP.Value, max)).AddTo(this);
 
         // 最大弾数変化 → アイコン再構築
@@ -79,6 +90,16 @@ public class GameHUD : MonoBehaviour
         }
 
         RefreshAmmo(bulletManager.getTotalRounds.Value);
+    }
+
+    private void ShakeHPBar()
+    {
+        if (_hpBarRoot == null) return;
+        LMotion.Shake.Create(Vector2.zero, new Vector2(3f, 0f), 0.3f)
+            .WithFrequency(8)
+            .WithDampingRatio(1f)
+            .BindToAnchoredPosition(_hpBarRoot)
+            .AddTo(this);
     }
 
     private void RefreshAmmo(int rounds)
