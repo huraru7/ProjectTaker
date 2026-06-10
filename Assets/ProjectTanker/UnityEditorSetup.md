@@ -511,51 +511,7 @@ STEP 7-2 と同様に、`EnemyTank` の各部位に以下を適用します。
 
 ---
 
-## 10-3. 照準レティクルを作成する
-
-1. Canvas を右クリック → `Create Empty` → 名前を **`Crosshair`** に変更
-2. `Add Component → CrosshairController` を追加
-3. 以下の子 Image を作成して十字線を構成する
-
-### 上の縦線
-
-Canvas > Crosshair を右クリック → `UI → Image` → 名前 **`Line_Top`**
-
-| 項目 | 値 |
-|---|---|
-| Width × Height | `2 × 14` |
-| Anchored Position | `(0, 11)` ※中心から 8px 離れた位置 |
-| Color | `#FFFFFF` |
-
-### 下の縦線
-
-名前 **`Line_Bottom`**、Anchored Position: `(0, -11)`、幅高さ同じ
-
-### 左の横線
-
-名前 **`Line_Left`**、Anchored Position: `(-11, 0)`、Width × Height: `14 × 2`
-
-### 右の横線
-
-名前 **`Line_Right`**、Anchored Position: `(11, 0)`、Width × Height: `14 × 2`
-
-### 中心ドット
-
-名前 **`CenterDot`**、Width × Height: `8 × 8`、Color: `#F5C518`（黄色）、Sprite: `Circle`
-
-### CrosshairController への参照アサイン
-
-`Crosshair` オブジェクトの `CrosshairController` に以下をアサイン
-
-| フィールド | アサインするもの |
-|---|---|
-| `_crosshairRoot` | `Crosshair` オブジェクト自身の RectTransform |
-| `_canvas` | シーンの Canvas |
-| `_bulletManager` | プレイヤー Tank の `TankBulletManager` |
-
----
-
-## 10-4. HP バーのルート RectTransform をアサインする
+## 10-3. HP バーのルート RectTransform をアサインする
 
 既存の `GameHUD` コンポーネントに `_hpBarRoot` フィールドが追加されています。
 
@@ -581,9 +537,6 @@ Canvas > Crosshair を右クリック → `UI → Image` → 名前 **`Line_Top`
 | 弾を発射すると黄色い残光（トレイル）が付く | ✅ LineRenderer トレイル動作中 |
 | 弾が壁に当たると灰色の小さな丸跡が残る | ✅ BulletMark スポーン中 |
 | 壁跡が約10秒かけてフェードアウトする | ✅ LitMotion フェード動作中 |
-| OS のカーソルが非表示になっている | ✅ CrosshairController 動作中 |
-| マウスに追従する黄色ドット＋白い十字の照準がある | ✅ CrosshairController 動作中 |
-| スペースキーで発射すると照準が一瞬大きくなる | ✅ パルスアニメーション動作中 |
 | ダメージを受けると HP バーが横に揺れる | ✅ LitMotion Shake 動作中 |
 | 上下矢印キーでバレルが独立して回転する | ✅ BarrelController 動作中 |
 | バレルの向いた方向に弾が飛ぶ | ✅ MuzzlePosition 発射 |
@@ -602,9 +555,6 @@ Canvas > Crosshair を右クリック → `UI → Image` → 名前 **`Line_Top`
 
 ### LineRenderer トレイルが表示されない
 → Bullet Prefab に `LineRenderer` コンポーネントが追加されているか確認。Material が `Sprites/Default` になっているか確認。
-
-### 照準が正しい位置に表示されない
-→ CrosshairController の `_canvas` が `Screen Space - Overlay` モードの場合は `worldCamera` が `null` でも動作します。Canvas の Render Camera フィールドが空のままなら問題ありません。
 
 ### 被弾跡が表示されない
 → EffectManager の `BulletMarkSpawner._markPrefab` に BulletMark Prefab がアサインされているか確認。
