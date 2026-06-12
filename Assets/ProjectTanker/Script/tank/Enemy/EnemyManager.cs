@@ -1,3 +1,4 @@
+using R3;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour
@@ -23,6 +24,15 @@ public class EnemyManager : MonoBehaviour
     void Start()
     {
         _ai?.OnInitialize(this);
+
+        _tankStatus.OnDead
+            .Subscribe(_ =>
+            {
+                _ai = null;
+                ExplosionEffect.SpawnAt(transform.position);
+                gameObject.SetActive(false);
+            })
+            .AddTo(this);
     }
 
     void Update()
@@ -45,9 +55,7 @@ public class EnemyManager : MonoBehaviour
         _bulletManager.FireInDirection(direction);
     }
 
-    // AI がバレルを向ける際に呼ぶメソッド（Stage 2 で各 AI から使用）
     public void AimBarrel(Vector2 worldDir) => _barrel.RotateToward(worldDir, _tankStatus.getBarrelTurnRate.Value);
 
-    // バレルの向き（Stage 2 の AI 角度判定で使用）
     public Vector2 BarrelAimDirection => _barrel.AimDirection;
 }

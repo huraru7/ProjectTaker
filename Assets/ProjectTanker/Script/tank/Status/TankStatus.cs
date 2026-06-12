@@ -1,4 +1,3 @@
-using System;
 using R3;
 using UnityEngine;
 
@@ -17,6 +16,9 @@ public class TankStatus : MonoBehaviour
     [SerializeField] private SerializableReactiveProperty<int> magazineCapacity;
     [SerializeField] private SerializableReactiveProperty<float> reloadTime;
     [SerializeField] private SerializableReactiveProperty<float> barrelTurnRate;
+
+    private Subject<Unit> _onDead = new();
+    public Observable<Unit> OnDead => _onDead;
 
     public SerializableReactiveProperty<int> getHP => HP;
     public SerializableReactiveProperty<int> getMaxHP => maxHP;
@@ -82,5 +84,6 @@ public class TankStatus : MonoBehaviour
     {
         if (amount <= 0) return;
         HP.Value = Mathf.Clamp(HP.Value - amount, 0, maxHP.Value);
+        if (HP.Value == 0) _onDead.OnNext(Unit.Default);
     }
 }
