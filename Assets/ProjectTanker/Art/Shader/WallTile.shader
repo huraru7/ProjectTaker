@@ -10,13 +10,12 @@ Shader "Custom/WallTile"
     {
         Tags
         {
-            "RenderType"     = "Transparent"
-            "Queue"          = "Transparent"
+            "RenderType"     = "Opaque"
+            "Queue"          = "Geometry"
             "RenderPipeline" = "UniversalPipeline"
         }
 
-        Blend SrcAlpha OneMinusSrcAlpha
-        ZWrite Off
+        ZWrite On
         Cull Off
 
         Pass
@@ -61,8 +60,8 @@ Shader "Custom/WallTile"
             half4 frag(Varyings IN) : SV_Target
             {
                 half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                // スプライトの透明度を維持しつつ _Color で全面を塗る
-                return half4(_Color.rgb * IN.color.rgb, tex.a * IN.color.a);
+                // _Color で全面を塗る（不透明）
+                return half4(_Color.rgb * IN.color.rgb, 1.0);
             }
             ENDHLSL
         }
