@@ -111,8 +111,8 @@ public class GameHUD : MonoBehaviour
         if (_ammoIcons == null || theme == null) return;
         for (int i = 0; i < _ammoIcons.Length; i++)
         {
-            // 残弾のアイコンは薄色、消費済みは濃色
-            _ammoIcons[i].color = i < rounds ? theme.border : theme.textPrimary;
+            // 残弾のアイコンは濃色、消費済みは薄色
+            _ammoIcons[i].color = i < rounds ? theme.textPrimary : theme.border;
         }
     }
 }

@@ -36,6 +36,7 @@ public class TankBulletManager : BulletManagerBase
     void Awake()
     {
         _wallMask = LayerMask.GetMask("Wall");
+        totalRounds.Value = 0;
         for (int i = 0; i < _poolSize; i++)
         {
             var obj = Instantiate(bullet, transform.position, Quaternion.identity, _bulletParent);
