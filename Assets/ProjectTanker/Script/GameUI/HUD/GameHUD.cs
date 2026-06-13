@@ -78,8 +78,12 @@ public class GameHUD : MonoBehaviour
     {
         if (ammoContainer == null || ammoBulletPrefab == null) return;
 
+        // テンプレート（ammoBulletPrefab）自身は破棄しない
         foreach (Transform child in ammoContainer)
-            Destroy(child.gameObject);
+            if (child != ammoBulletPrefab.transform)
+                Destroy(child.gameObject);
+
+        ammoBulletPrefab.gameObject.SetActive(false); // テンプレートは常に非表示
 
         _ammoIcons = new Image[capacity];
         for (int i = 0; i < capacity; i++)
