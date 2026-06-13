@@ -8,11 +8,10 @@
 2. `Add Component → GameManager`
 3. Inspector で各フィールドをアサイン
 
-| フィールド      | アサイン先                                 |
-| --------------- | ------------------------------------------ |
-| Player Status   | PlayerTank の `TankStatus` コンポーネント  |
-| Enemy Container | Hierarchy の `EnemyContainer` オブジェクト |
-| Result UI       | 次の手順で作る `ResultPanel`               |
+| フィールド      | アサイン先                                |
+| --------------- | ----------------------------------------- |
+| Player Status   | PlayerTank の `TankStatus` コンポーネント |
+| Result UI       | 次の手順で作る `ResultPanel`              |
 
 ---
 
@@ -43,6 +42,8 @@ Canvas
 6. **`ResultPanel` を非活性にしておく**（Inspector の チェックボックスを OFF）
 7. `GameManager` の ResultUI フィールドに `ResultPanel` をアサイン
 
+> **クリア条件の実装方法:** 任意のスクリプトから `GameManager.TriggerClear()` を呼ぶと "STAGE CLEAR" が表示される。
+
 ---
 
 ## STEP A-3 — Build Settings に 2_title を追加
@@ -54,29 +55,52 @@ Canvas
 
 # ビジュアル強化 セットアップ
 
-## STEP B-1 — キャタピラースクロール
+## STEP B-1 — 走行時の煙エフェクト（TrackDustEffect）
 
-### tank_tracks.png の Import 設定変更
+タンクが走行する際、キャタピラー左右の地面から煙が立ち上がる演出を設定する。
 
-1. Project ウィンドウで `Assets/ProjectTanker/Art/Image/tank_tracks.png` を選択
-2. Inspector → **Wrap Mode** を `Repeat` に変更
-3. `Apply` を押す
+### 子オブジェクトの作成（PlayerTank・EnemyTank 各 1 体ずつ設定）
 
-### プレイヤータンクへの設定
+1. タンクルートを右クリック → `Create Empty` → 名前 **`LeftTrackDust`**
+   - Transform Position: `(-0.3, 0, 0)`
+   - `Add Component → Particle System`
+2. 同様に **`RightTrackDust`** を作成
+   - Transform Position: `(0.3, 0, 0)`
+   - `Add Component → Particle System`
 
-1. `PlayerTank` の子にある tracks SpriteRenderer を持つオブジェクトを選択
-2. `Add Component → TrackScroller`
-3. Inspector でフィールドをアサイン
+### ParticleSystem の設定（LeftTrackDust / RightTrackDust 共通）
 
-| フィールド     | アサイン先                           |
-| -------------- | ------------------------------------ |
-| Track Renderer | tracks オブジェクトの SpriteRenderer |
-| Rb             | PlayerTank ルートの Rigidbody2D      |
+| 項目 | 値 |
+|------|-----|
+| Looping | ON |
+| Start Lifetime | `0.4` |
+| Start Speed | `0.8` |
+| Start Size | `0.15` |
+| Start Color | グレー `(0.5, 0.5, 0.5, 0.5)` ※ Alpha 128 |
+| Shape → Shape | `Box` |
+| Shape → Scale | `(0.1, 0.2, 0)` |
+| Emission → Rate over Time | `20`（スクリプトが実行時に上書き） |
+| Renderer → Order in Layer | `3`（タンク本体より手前） |
+| Renderer → Material | **設定不要**（スクリプトが自動でアサイン） |
 
-### エネミータンクへの設定
+### マテリアルの作成（1 回だけ）
 
-1. `EnemyTank` の子の tracks SpriteRenderer を持つオブジェクトを選択
-2. 上記と同様に `TrackScroller` をアタッチし、エネミータンクの Rigidbody2D をアサイン
+1. Project ウィンドウで `Assets/ProjectTanker/Art` 内を右クリック → `Create → Material` → 名前 **`TrackDust`**
+2. Inspector で Shader を **`Universal Render Pipeline/Particles/Unlit`** に変更
+3. **Surface Type** を `Transparent` に変更
+4. **Blending Mode** を `Alpha` に変更（`Additive` にすると背景に溶けて見えなくなるので注意）
+
+### TrackDustEffect コンポーネントのアサイン
+
+1. タンクルートに `Add Component → TrackDustEffect`
+2. Inspector でフィールドをアサイン
+
+| フィールド    | アサイン先                              |
+| ------------- | --------------------------------------- |
+| Left Dust     | `LeftTrackDust` の ParticleSystem       |
+| Right Dust    | `RightTrackDust` の ParticleSystem      |
+| Rb            | タンクルートの Rigidbody2D              |
+| Dust Material | 上で作成した `TrackDust` マテリアル     |
 
 ---
 
@@ -110,11 +134,12 @@ Canvas
 
 ## 動作確認（ゲームループ + ビジュアル強化）
 
-| 確認項目                    | 期待する結果                             |
-| --------------------------- | ---------------------------------------- |
-| 敵タンクの HP を 0 にする   | 爆発エフェクト再生 → EnemyTank が非表示  |
-| 全敵が倒される              | "STAGE CLEAR" パネルが表示され時間停止   |
-| プレイヤーの HP が 0 になる | "GAME OVER" パネルが表示され時間停止     |
-| リトライボタンを押す        | シーンが再読込みされ再プレイできる       |
-| タンクが前進する            | キャタピラーのテクスチャが縦方向に流れる |
-| 敵にダメージを与える        | 頭上の赤バーが縮む                       |
+| 確認項目                                  | 期待する結果                             |
+| ----------------------------------------- | ---------------------------------------- |
+| `GameManager.TriggerClear()` を呼ぶ       | "STAGE CLEAR" パネルが表示され時間停止   |
+| プレイヤーの HP が 0 になる               | "GAME OVER" パネルが表示され時間停止     |
+| リトライボタンを押す                      | シーンが再読込みされ再プレイできる       |
+| タイトルボタンを押す                      | 2_title シーンに遷移する                 |
+| タンクが前進・旋回する                    | 左右キャタピラー位置から灰色の煙が出る   |
+| タンクが停止する                          | 煙が止まる                               |
+| 敵にダメージを与える                      | 頭上の赤バーが縮む                       |
