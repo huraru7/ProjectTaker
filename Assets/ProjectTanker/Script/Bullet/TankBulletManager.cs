@@ -35,6 +35,7 @@ public class TankBulletManager : BulletManagerBase
 
     void Awake()
     {
+        _wallMask = LayerMask.GetMask("Wall");
         for (int i = 0; i < _poolSize; i++)
         {
             var obj = Instantiate(bullet, transform.position, Quaternion.identity, _bulletParent);
@@ -122,6 +123,8 @@ public class TankBulletManager : BulletManagerBase
         UpdateAimLine();
     }
 
+    private int _wallMask;
+
     private void UpdateAimLine()
     {
         if (_aimLine == null) return;
@@ -135,9 +138,9 @@ public class TankBulletManager : BulletManagerBase
 
         for (int bounce = 0; bounce <= _maxBounces; bounce++)
         {
-            RaycastHit2D hit = Physics2D.Raycast(origin, dir, remaining);
+            RaycastHit2D hit = Physics2D.Raycast(origin, dir, remaining, _wallMask);
 
-            if (hit && hit.collider.TryGetComponent<Wall>(out _))
+            if (hit)
             {
                 points.Add(hit.point);
                 remaining -= hit.distance;
