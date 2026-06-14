@@ -1,4 +1,4 @@
-Shader "Custom/CelShading"
+Shader "ProjectTanker/CelShading"
 {
     Properties
     {

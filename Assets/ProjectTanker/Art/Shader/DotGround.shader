@@ -1,4 +1,4 @@
-Shader "Custom/DotGround"
+Shader "ProjectTanker/DotGround"
 {
     Properties
     {

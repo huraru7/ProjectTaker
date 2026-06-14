@@ -1,4 +1,4 @@
-Shader "Custom/HPBar"
+Shader "ProjectTanker/HPBar"
 {
     Properties
     {

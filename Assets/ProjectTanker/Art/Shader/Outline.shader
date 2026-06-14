@@ -1,4 +1,4 @@
-Shader "Custom/Outline"
+Shader "ProjectTanker/Outline"
 {
     Properties
     {

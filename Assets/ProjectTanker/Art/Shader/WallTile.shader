@@ -1,4 +1,4 @@
-Shader "Custom/WallTile"
+Shader "ProjectTanker/WallTile"
 {
     Properties
     {
