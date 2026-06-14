@@ -27585,7 +27585,7 @@ MonoBehaviour:
   orbPrefab: {fileID: 5695603860999864608, guid: d0702ad4b40ec6d4e98fcd2c304fe87a, type: 3}
   playerTransform: {fileID: 781937999}
   moduleManager: {fileID: 781938004}
-  poolSize: 30
+  poolSize: 12
 --- !u!4 &1807030735
 Transform:
   m_ObjectHideFlags: 0
