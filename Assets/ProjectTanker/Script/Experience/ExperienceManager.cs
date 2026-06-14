@@ -21,7 +21,7 @@ public class ExperienceManager : MonoBehaviour
 
     public int CurrentLevel => _currentLevel;
     public int CurrentXp    => _currentXp;
-    public int RequiredXp   => Mathf.CeilToInt(Mathf.Pow(_currentLevel, 1.25f));
+    public int RequiredXp   => Mathf.CeilToInt(Mathf.Pow(_currentLevel, 1.25f)) + 20;
 
     private static readonly Dictionary<Type, int> BaseXpTable = new()
     {
