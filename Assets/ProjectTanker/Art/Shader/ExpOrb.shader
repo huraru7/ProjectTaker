@@ -5,6 +5,7 @@ Shader "ProjectTanker/ExpOrb"
         _Color       ("Orb Color",   Color)        = (0.08, 0.98, 0.22, 1)
         _PulseSpeed  ("Pulse Speed", Float)        = 2.5
         _PulseAmount ("Pulse Scale", Range(0,0.2)) = 0.08
+        _Intensity   ("Bloom Intensity", Float)    = 3.0
     }
 
     SubShader
@@ -34,6 +35,7 @@ Shader "ProjectTanker/ExpOrb"
                 float4 _Color;
                 float  _PulseSpeed;
                 float  _PulseAmount;
+                float  _Intensity;
             CBUFFER_END
 
             struct Attributes
@@ -84,6 +86,9 @@ Shader "ProjectTanker/ExpOrb"
                 // 白いスペキュラハイライト（左上にオフセット）
                 float spec = smoothstep(0.3, 0.03, length(uv + float2(0.1, 0.1)) * 2.0);
                 col += spec * 0.9;
+
+                // HDR 出力: _Intensity > 1 でブルームに寄与する
+                col *= _Intensity;
 
                 // SpriteRenderer の Color を反映
                 return half4(col, alpha) * IN.color;
