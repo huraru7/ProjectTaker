@@ -132,6 +132,150 @@ Canvas
 
 ---
 
+---
+
+# 通知システム セットアップ
+
+## STEP C-1 — NotificationManager の配置
+
+### Canvas 階層の構築
+
+既存の Canvas 直下に以下の階層を作成する。
+
+```
+Canvas
+└── NotificationRoot  ← 空 GameObject（整理用）
+    └── NotificationContainer  ← RectTransform、NotificationManager.cs をアタッチ
+```
+
+1. Canvas を右クリック → `Create Empty` → 名前 **`NotificationRoot`**
+2. `NotificationRoot` の子に `Create Empty` → 名前 **`NotificationContainer`**
+3. `NotificationContainer` の RectTransform を以下に設定
+
+| プロパティ | 値 |
+|---|---|
+| Anchor Min / Max | `(0, 1)` / `(0, 1)` |
+| Pivot | `(0, 1)` |
+| Pos X | `16` |
+| Pos Y | `-16` |
+| Width | `340` |
+
+4. `NotificationContainer` に `Add Component → NotificationManager`
+5. Inspector でフィールドをセット（Entry Prefab は次の手順で作成）
+
+| フィールド | 設定内容 |
+|---|---|
+| Entry Prefab | 次手順で作る `NotificationEntry` Prefab |
+| Default Duration | `3.5` |
+| Max Entries | `5` |
+| Entry Spacing | `8` |
+| Top Margin | `16` |
+| Container | `NotificationContainer` の RectTransform 自身 |
+
+---
+
+## STEP C-2 — NotificationEntry Prefab の作成
+
+### Prefab 階層
+
+```
+NotificationEntry  (RectTransform 320×64、CanvasGroup)
+├── Background    (Image、#1E2228、alpha 0.92)
+├── AccentBar     (Image、4px 幅、縦ストレッチ)
+├── IconRoot      (空 GameObject)
+│   └── Icon     (Image、36×36)
+└── MessageText   (TextMeshProUGUI、size 13、白、左中央揃え)
+```
+
+**作成手順**
+
+1. `NotificationContainer` 下に `Create Empty` → 名前 **`NotificationEntry`**
+2. RectTransform サイズを `(320, 64)` に設定
+3. `Add Component → CanvasGroup`
+4. `Add Component → NotificationEntry`
+5. 子 **`Background`** を作成
+   - `UI → Image`
+   - Color: `#1E2228`、Alpha: `0.92`
+   - Stretch 設定（Anchor を四隅に広げる）
+6. 子 **`AccentBar`** を作成
+   - `UI → Image`
+   - Anchor: 左端に縦ストレッチ（Min `(0,0)` / Max `(0,1)`）
+   - Width: `4`、Pos X: `0`
+   - Color はスクリプトが動的に変更するため任意
+7. 子 **`IconRoot`** を作成（`Create Empty`）
+   - その子に `UI → Image` → 名前 **`Icon`**、サイズ `(36, 36)`
+8. 子 **`MessageText`** を作成
+   - `UI → Text - TextMeshPro`
+   - Font Size: `13`、Color: `白`、Alignment: 左中央
+   - 左マージンを AccentBar + Icon 分だけ確保（Padding Left: 50 程度）
+9. `NotificationEntry` コンポーネントの Inspector でフィールドをアサイン
+
+| フィールド | アサイン先 |
+|---|---|
+| Accent Bar | `AccentBar` の Image |
+| Icon Image | `Icon` の Image |
+| Icon Root | `IconRoot` GameObject |
+| Message Text | `MessageText` の TextMeshProUGUI |
+
+10. `NotificationEntry` を Prefab 化（`Assets/ProjectTanker/Prefab/` にドラッグ）
+11. シーン上の仮オブジェクトは削除し、Prefab を `NotificationManager` の `Entry Prefab` フィールドにセット
+
+---
+
+## STEP C-3 — TutorialManager の配置（オプション）
+
+チュートリアルステップを Inspector から設定して順番に通知を出したい場合に追加する。
+
+1. Hierarchy で `Create Empty` → 名前 **`TutorialManager`**
+2. `Add Component → TutorialManager`
+3. Inspector の `Steps` リストに各ステップを追加
+
+| フィールド | 設定内容 |
+|---|---|
+| Message | 表示するテキスト（TextArea） |
+| Duration | 表示時間（秒）。デフォルト `5` |
+| Delay Before | このステップの前に待つ時間（秒） |
+| Icon | アイコン Sprite（任意） |
+
+**コードからチュートリアルを開始する場合**
+
+```csharp
+TutorialManager.Instance.StartTutorial("intro");
+```
+
+`StartTutorial` は同じ ID が完了済みであれば自動でスキップする（`force: true` で強制再実行）。
+
+---
+
+## STEP C-4 — 通知を呼び出す
+
+```csharp
+// 基本（青）
+NotificationManager.Show("メッセージ");
+
+// チュートリアル（黄）
+NotificationManager.Tutorial("弾を撃ってスイッチを ON にしよう！");
+
+// 警告（オレンジ）
+NotificationManager.Warning("弾数が残り少ない");
+
+// 成功（緑）
+NotificationManager.Success("ドアを開けた！");
+```
+
+---
+
+## 動作確認（通知システム）
+
+| 確認項目 | 期待する結果 |
+|---|---|
+| `NotificationManager.Show("テスト")` を呼ぶ | 左上からスライドインして表示される |
+| 複数回連続で呼ぶ | 古い通知が下へ押し出されて並ぶ |
+| 6 件以上呼ぶ | 最古の通知が消えて 5 件以内に収まる |
+| 一定時間後 | フェードアウトして自動消滅する |
+
+---
+
 ## 動作確認（ゲームループ + ビジュアル強化）
 
 | 確認項目                                  | 期待する結果                             |

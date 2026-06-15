@@ -24,12 +24,51 @@ GimmickButton ──→ ChannelA ──→ GimmickDoor
 
 **① ChannelA.asset を作成**
 
-**② ボタンオブジェクトを作る**
-1. Hierarchy で空の GameObject を作成 → 名前「Button」
-2. `GimmickButton` コンポーネントを追加
-3. `Collider2D`（CircleCollider2D など）を追加して **Is Trigger にチェック**
-4. Inspector で Channel に `ChannelA.asset` をセット
-5. `Send Once` を ON にすると一度だけ反応（OFF だと何度でも反応）
+**② ボタンオブジェクトを作る（ビジュアルスイッチ構成）**
+
+GimmickButton は「ベース台座」＋「レバー」＋「LED インジケーター」の 3 層構造で作る。
+
+```
+Button (GameObject)
+├── GimmickButton.cs
+├── SpriteRenderer（台座スプライト）
+│
+├── Indicator (子 GameObject)
+│   └── SpriteRenderer ← GimmickSwitch マテリアル割当（LED 発光ドット）
+│
+└── SwitchLever (子 GameObject)
+    ├── SpriteRenderer（レバースプライト）
+    ├── CircleCollider2D ← Is Trigger = TRUE
+    └── SwitchPart.cs
+```
+
+**マテリアル作成（初回のみ）**
+1. `Art/Materials/` 内で右クリック → Create > Material → 名前 **`GimmickSwitch`**
+2. Shader を `ProjectTanker/GimmickSwitch` に変更
+
+**Prefab 構築手順**
+1. Hierarchy で `Create Empty` → 名前 **`Button`**
+2. `GimmickButton` コンポーネントをアタッチ
+3. 任意で台座用 `SpriteRenderer` を追加
+4. 子オブジェクト **`Indicator`** を作成
+   - `SpriteRenderer` をアタッチ
+   - Material に `GimmickSwitch` をセット（小さな丸スプライト推奨）
+5. 子オブジェクト **`SwitchLever`** を作成
+   - `SpriteRenderer` をアタッチ（縦長の矩形など）
+   - `CircleCollider2D` をアタッチ → **Is Trigger にチェック**
+   - `SwitchPart` コンポーネントをアタッチ
+6. `Button` ルートの `GimmickButton` Inspector で以下をセット
+
+| フィールド | 設定内容 |
+|---|---|
+| Channel | ChannelA.asset |
+| Send Once | 一度のみ反応させる場合は ON |
+| Lever Transform | `SwitchLever` の Transform をドラッグ |
+| Indicator Renderer | `Indicator` の SpriteRenderer をドラッグ |
+| Lever On Angle | `-45`（左倒れ）または `45`（右倒れ） |
+| Anim Duration | `0.2`（秒） |
+
+> **Physics 2D 確認**: Bullet の Layer と SwitchLever の Layer が `Project Settings → Physics 2D → Layer Collision Matrix` で交差が有効になっていること（既存ボタンと同 Layer なら変更不要）。
 
 **③ ドアオブジェクトを作る**
 1. 空の GameObject を作成 → 名前「Door」
