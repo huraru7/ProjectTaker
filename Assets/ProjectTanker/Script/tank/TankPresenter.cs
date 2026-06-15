@@ -54,7 +54,5 @@ public class TankPresenter : MonoBehaviour
         tankModuleManager.OnSlotsChanged
             .Subscribe(slots => slotUI.UpdateDisplay(slots))
             .AddTo(this);
-
-        tankModuleManager.ModuleEarn(); // デバッグ用
     }
 }
