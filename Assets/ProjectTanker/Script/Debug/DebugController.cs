@@ -10,4 +10,9 @@ public class DebugController : MonoBehaviour
         if (Keyboard.current.mKey.wasPressedThisFrame)
             tankModuleManager.ModuleEarn();
     }
+
+    void Start()
+    {
+        NotificationManager.Show("これがテストメッセージ、最も完璧です。");
+    }
 }

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BackGroundMaterial
-  m_Shader: {fileID: 4800000, guid: ec99c7c1d2c9c4a479776a467d37c0b5, type: 3}
+  m_Name: GimmickSwitch
+  m_Shader: {fileID: 4800000, guid: b4d2a57216a7d3c458cc80ac6a0c5981, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -42,17 +42,13 @@ Material:
     m_Ints: []
     m_Floats:
     - _EnableExternalAlpha: 0
-    - _GridSize: 5
-    - _GridSize2: 5
-    - _LineWidth: 0.95
-    - _LineWidth2: 0.95
+    - _GlowAmount: 0.6
+    - _IsOn: 0
     - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 0.93333334, g: 0.93333334, b: 0.93333334, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _LineColor: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 0.39215687}
-    - _LineColor2: {r: 1, g: 1, b: 1, a: 0.35}
-    - _Offset: {r: 0, g: 0, b: 0, a: 0}
+    - _OffColor: {r: 0.54999995, g: 0.049999982, b: 0.049999982, a: 1}
+    - _OnColor: {r: 0.09999997, g: 0.9, b: 0.24999997, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

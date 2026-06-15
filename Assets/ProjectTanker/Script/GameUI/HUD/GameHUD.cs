@@ -1,3 +1,6 @@
+using System.Collections;
+using LitMotion;
+using LitMotion.Extensions;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -14,18 +17,32 @@ public class GameHUD : MonoBehaviour
     [Header("HP")]
     [SerializeField] private Image hpFill;
     [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private RectTransform _hpBarRoot;
 
     [Header("弾数")]
     [SerializeField] private Transform ammoContainer;      // 弾アイコンを並べる親
     [SerializeField] private Image ammoBulletPrefab;       // 弾アイコンPrefab（Image）
     [SerializeField] private Image reloadCircle;           // リロード中の円形プログレス
 
+    [Header("経験値")]
+    [SerializeField] private Image           xpFill;
+    [SerializeField] private TextMeshProUGUI levelText;
+
     private Image[] _ammoIcons;
+    private int _lastHP;
+    private MotionHandle _xpTween;
 
     void Start()
     {
-        // HP変化を購読
-        tankStatus.getHP.Subscribe(hp => RefreshHP(hp, tankStatus.getMaxHP.Value)).AddTo(this);
+        _lastHP = tankStatus.getHP.Value;
+
+        // HP変化を購読（減少時にシェイク演出を追加）
+        tankStatus.getHP.Subscribe(hp =>
+        {
+            if (hp < _lastHP) ShakeHPBar();
+            _lastHP = hp;
+            RefreshHP(hp, tankStatus.getMaxHP.Value);
+        }).AddTo(this);
         tankStatus.getMaxHP.Subscribe(max => RefreshHP(tankStatus.getHP.Value, max)).AddTo(this);
 
         // 最大弾数変化 → アイコン再構築
@@ -36,6 +53,24 @@ public class GameHUD : MonoBehaviour
 
         if (reloadCircle != null)
             reloadCircle.gameObject.SetActive(false);
+
+        // 経験値変化を購読
+        if (ExperienceManager.Instance != null)
+        {
+            ExperienceManager.Instance.OnXpChanged
+                .Subscribe(_ => RefreshXp())
+                .AddTo(this);
+            RefreshXp();
+        }
+
+        // Start() の実行順序に依存しないよう 1 フレーム後に強制リフレッシュ
+        StartCoroutine(InitAmmoDisplay());
+    }
+
+    private IEnumerator InitAmmoDisplay()
+    {
+        yield return null;
+        BuildAmmoIcons(tankStatus.getMagazineCapacity.Value);
     }
 
     void Update()
@@ -55,7 +90,6 @@ public class GameHUD : MonoBehaviour
         float ratio = max > 0 ? (float)hp / max : 0f;
         hpFill.fillAmount = ratio;
 
-        // HP残量に応じて fire(赤) → wind(黄) でグラデーション
         if (theme != null)
             hpFill.color = Color.Lerp(theme.fire, theme.wind, ratio);
 
@@ -68,7 +102,10 @@ public class GameHUD : MonoBehaviour
         if (ammoContainer == null || ammoBulletPrefab == null) return;
 
         foreach (Transform child in ammoContainer)
-            Destroy(child.gameObject);
+            if (child != ammoBulletPrefab.transform)
+                Destroy(child.gameObject);
+
+        ammoBulletPrefab.gameObject.SetActive(false);
 
         _ammoIcons = new Image[capacity];
         for (int i = 0; i < capacity; i++)
@@ -81,12 +118,43 @@ public class GameHUD : MonoBehaviour
         RefreshAmmo(bulletManager.getTotalRounds.Value);
     }
 
+    private void ShakeHPBar()
+    {
+        if (_hpBarRoot == null) return;
+        LMotion.Shake.Create(_hpBarRoot.anchoredPosition, new Vector2(3f, 0f), 0.3f)
+            .WithFrequency(8)
+            .WithDampingRatio(1f)
+            .BindToAnchoredPosition(_hpBarRoot)
+            .AddTo(this);
+    }
+
+    private void RefreshXp()
+    {
+        if (ExperienceManager.Instance == null) return;
+
+        int   level    = ExperienceManager.Instance.CurrentLevel;
+        int   xp       = ExperienceManager.Instance.CurrentXp;
+        int   required = ExperienceManager.Instance.RequiredXp;
+        float target   = required > 0 ? (float)xp / required : 0f;
+
+        if (xpFill != null)
+        {
+            if (_xpTween.IsActive()) _xpTween.Cancel();
+            _xpTween = LMotion.Create(xpFill.fillAmount, target, 0.4f)
+                .WithEase(Ease.OutCubic)
+                .Bind(v => xpFill.fillAmount = v)
+                .AddTo(this);
+        }
+
+        if (levelText != null)
+            levelText.text = $"Lv.{level}";
+    }
+
     private void RefreshAmmo(int rounds)
     {
         if (_ammoIcons == null || theme == null) return;
         for (int i = 0; i < _ammoIcons.Length; i++)
         {
-            // 残弾のアイコンは濃色、消費済みは薄色
             _ammoIcons[i].color = i < rounds ? theme.textPrimary : theme.border;
         }
     }
