@@ -24,6 +24,8 @@ public class TankBulletManager : BulletManagerBase
     [SerializeField] private SerializableReactiveProperty<int> totalRounds;
     public SerializableReactiveProperty<int> getTotalRounds => totalRounds;
 
+    public event System.Action<Bullet> OnBulletFired;
+
     public float ReloadProgress => _tankStatus != null && totalRounds.Value < _tankStatus.getMagazineCapacity.Value
         ? Mathf.Clamp01(currentTime / _tankStatus.getReloadTime.Value)
         : 0f;
@@ -176,6 +178,7 @@ public class TankBulletManager : BulletManagerBase
         b.gameObject.SetActive(true);
         b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value);
         totalRounds.Value--;
+        OnBulletFired?.Invoke(b);
     }
 
     public override void Fire()

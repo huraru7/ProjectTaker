@@ -11,6 +11,10 @@ public class Bullet : MonoBehaviour
     [Header("Trail")]
     [SerializeField] private int _trailLength = 12;
 
+    public event System.Action<Vector2, TankStatus> OnImpact;
+    public event System.Action OnWallBounce;
+    public int BonusDamage { get; set; }
+
     private float speed;
     private float _currentLifeTime;
     private Rigidbody2D _rb;
@@ -90,8 +94,14 @@ public class Bullet : MonoBehaviour
     void OnDisable()
     {
         _rb.linearVelocity = Vector2.zero;
+        BonusDamage = 0;
         // プールへ返却時にトレイルを非表示にする
         _lineRenderer.positionCount = 0;
+    }
+
+    public void ForceReturn()
+    {
+        if (_owner != null) _owner.ReturnBullet(this);
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -105,12 +115,15 @@ public class Bullet : MonoBehaviour
             Vector2 normal = contact.normal;
             _direction = Vector2.Reflect(_direction, normal);
             _rb.linearVelocity = _direction * speed;
+            OnWallBounce?.Invoke();
             return;
         }
 
         if (collision.gameObject.TryGetComponent<BulletManagerBase>(out var bulletManager))
         {
-            bulletManager.TakeDamage(damage);
+            var targetStatus = collision.gameObject.GetComponentInParent<TankStatus>();
+            bulletManager.TakeDamage(damage + BonusDamage);
+            OnImpact?.Invoke(transform.position, targetStatus);
             if (_owner != null) _owner.ReturnBullet(this);
         }
     }
