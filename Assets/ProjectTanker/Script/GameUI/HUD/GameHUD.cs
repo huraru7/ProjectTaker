@@ -1,4 +1,3 @@
-using System.Collections;
 using LitMotion;
 using LitMotion.Extensions;
 using R3;
@@ -10,33 +9,34 @@ using ProjectTanker.UI;
 public class GameHUD : MonoBehaviour
 {
     [Header("参照")]
-    [SerializeField] private TankStatus tankStatus;
+    [SerializeField] private TankStatus       tankStatus;
     [SerializeField] private TankBulletManager bulletManager;
-    [SerializeField] private ThemeColor theme;
+    [SerializeField] private ThemeColor        theme;
 
     [Header("HP")]
-    [SerializeField] private Image hpFill;
-    [SerializeField] private TextMeshProUGUI hpText;
-    [SerializeField] private RectTransform _hpBarRoot;
+    [SerializeField] private Image            hpFill;
+    [SerializeField] private TextMeshProUGUI  hpText;
+    [SerializeField] private RectTransform    _hpBarRoot;
 
     [Header("弾数")]
-    [SerializeField] private Transform ammoContainer;      // 弾アイコンを並べる親
-    [SerializeField] private Image ammoBulletPrefab;       // 弾アイコンPrefab（Image）
-    [SerializeField] private Image reloadCircle;           // リロード中の円形プログレス
+    [SerializeField] private Image            crosshairIcon;
+    [SerializeField] private Image            reloadCircle;
+    [SerializeField] private TextMeshProUGUI  ammoText;
+    [SerializeField] private GameObject       fullBadge;
+    [SerializeField] private Sprite           crosshairFullSprite;
+    [SerializeField] private Sprite           crosshairEmptySprite;
 
-    [Header("経験値")]
-    [SerializeField] private Image           xpFill;
-    [SerializeField] private TextMeshProUGUI levelText;
+    [Header("レベル")]
+    [SerializeField] private TextMeshProUGUI  levelText;
 
-    private Image[] _ammoIcons;
-    private int _lastHP;
-    private MotionHandle _xpTween;
+    private int           _lastHP;
+    private MotionHandle  _fullBadgeHandle;
+    private RectTransform _fullBadgeRt;
 
     void Start()
     {
         _lastHP = tankStatus.getHP.Value;
 
-        // HP変化を購読（減少時にシェイク演出を追加）
         tankStatus.getHP.Subscribe(hp =>
         {
             if (hp < _lastHP) ShakeHPBar();
@@ -45,16 +45,13 @@ public class GameHUD : MonoBehaviour
         }).AddTo(this);
         tankStatus.getMaxHP.Subscribe(max => RefreshHP(tankStatus.getHP.Value, max)).AddTo(this);
 
-        // 最大弾数変化 → アイコン再構築
-        tankStatus.getMagazineCapacity.Subscribe(BuildAmmoIcons).AddTo(this);
-
-        // 現在弾数変化 → アイコン色を更新
         bulletManager.getTotalRounds.Subscribe(RefreshAmmo).AddTo(this);
 
-        if (reloadCircle != null)
-            reloadCircle.gameObject.SetActive(false);
+        _fullBadgeRt = fullBadge != null ? fullBadge.GetComponent<RectTransform>() : null;
+        if (fullBadge != null) fullBadge.SetActive(false);
 
-        // 経験値変化を購読
+        if (reloadCircle != null) reloadCircle.gameObject.SetActive(false);
+
         if (ExperienceManager.Instance != null)
         {
             ExperienceManager.Instance.OnXpChanged
@@ -63,14 +60,7 @@ public class GameHUD : MonoBehaviour
             RefreshXp();
         }
 
-        // Start() の実行順序に依存しないよう 1 フレーム後に強制リフレッシュ
-        StartCoroutine(InitAmmoDisplay());
-    }
-
-    private IEnumerator InitAmmoDisplay()
-    {
-        yield return null;
-        BuildAmmoIcons(tankStatus.getMagazineCapacity.Value);
+        RefreshAmmo(bulletManager.getTotalRounds.Value);
     }
 
     void Update()
@@ -97,25 +87,33 @@ public class GameHUD : MonoBehaviour
             hpText.text = $"{hp} / {max}";
     }
 
-    private void BuildAmmoIcons(int capacity)
+    private void RefreshAmmo(int rounds)
     {
-        if (ammoContainer == null || ammoBulletPrefab == null) return;
+        int max = tankStatus.getMagazineCapacity.Value;
 
-        foreach (Transform child in ammoContainer)
-            if (child != ammoBulletPrefab.transform)
-                Destroy(child.gameObject);
+        if (ammoText != null)
+            ammoText.text = rounds.ToString();
 
-        ammoBulletPrefab.gameObject.SetActive(false);
+        if (crosshairIcon != null && crosshairFullSprite != null && crosshairEmptySprite != null)
+            crosshairIcon.sprite = rounds > 0 ? crosshairFullSprite : crosshairEmptySprite;
 
-        _ammoIcons = new Image[capacity];
-        for (int i = 0; i < capacity; i++)
+        bool isFull = max > 0 && rounds >= max;
+        if (fullBadge != null)
         {
-            var icon = Instantiate(ammoBulletPrefab, ammoContainer);
-            icon.gameObject.SetActive(true);
-            _ammoIcons[i] = icon;
+            if (isFull && !fullBadge.activeSelf)       ShowFullBadge();
+            else if (!isFull && fullBadge.activeSelf)  fullBadge.SetActive(false);
         }
+    }
 
-        RefreshAmmo(bulletManager.getTotalRounds.Value);
+    private void ShowFullBadge()
+    {
+        if (_fullBadgeHandle.IsActive()) _fullBadgeHandle.Cancel();
+        if (_fullBadgeRt != null) _fullBadgeRt.localScale = Vector3.zero;
+        fullBadge.SetActive(true);
+        _fullBadgeHandle = LMotion.Create(0f, 1f, 0.2f)
+            .WithEase(Ease.OutBack)
+            .Bind(s => { if (_fullBadgeRt != null) _fullBadgeRt.localScale = Vector3.one * s; })
+            .AddTo(this);
     }
 
     private void ShakeHPBar()
@@ -131,31 +129,7 @@ public class GameHUD : MonoBehaviour
     private void RefreshXp()
     {
         if (ExperienceManager.Instance == null) return;
-
-        int   level    = ExperienceManager.Instance.CurrentLevel;
-        int   xp       = ExperienceManager.Instance.CurrentXp;
-        int   required = ExperienceManager.Instance.RequiredXp;
-        float target   = required > 0 ? (float)xp / required : 0f;
-
-        if (xpFill != null)
-        {
-            if (_xpTween.IsActive()) _xpTween.Cancel();
-            _xpTween = LMotion.Create(xpFill.fillAmount, target, 0.4f)
-                .WithEase(Ease.OutCubic)
-                .Bind(v => xpFill.fillAmount = v)
-                .AddTo(this);
-        }
-
         if (levelText != null)
-            levelText.text = $"Lv.{level}";
-    }
-
-    private void RefreshAmmo(int rounds)
-    {
-        if (_ammoIcons == null || theme == null) return;
-        for (int i = 0; i < _ammoIcons.Length; i++)
-        {
-            _ammoIcons[i].color = i < rounds ? theme.textPrimary : theme.border;
-        }
+            levelText.text = $"Lv.{ExperienceManager.Instance.CurrentLevel}";
     }
 }
