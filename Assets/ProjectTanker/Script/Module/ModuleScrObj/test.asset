@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aafff0ac387d84036b49187cd4d491cc, type: 3}
-  m_Name: Module
+  m_Name: test
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: testmodule
   description: test^test^test
