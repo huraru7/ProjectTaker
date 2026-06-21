@@ -11,6 +11,7 @@ public class ModuleReplaceUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI newModuleName;
     [SerializeField] private ModuleOptionButton[] slotOptionButtons;
     [SerializeField] private Button discardButton;
+    [SerializeField] private float staggerDelay = 0.08f;
 
     // -1 = 破棄、0〜6 = 入れ替えるスロット番号
     private readonly Subject<int> _onDecision = new();
@@ -28,7 +29,10 @@ public class ModuleReplaceUI : MonoBehaviour
             ModuleData slotModule = i < currentSlots.Count ? currentSlots[i] : null;
             slotOptionButtons[i].gameObject.SetActive(slotModule != null);
             if (slotModule != null)
+            {
                 slotOptionButtons[i].Setup(slotModule, () => Decide(capturedIndex));
+                slotOptionButtons[i].PlayIntro(i * staggerDelay);
+            }
         }
 
         discardButton.onClick.RemoveAllListeners();
