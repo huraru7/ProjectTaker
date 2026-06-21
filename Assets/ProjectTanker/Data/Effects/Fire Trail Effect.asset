@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41391648cbcf1a944be8ec54c4a53507, type: 3}
   m_Name: Fire Trail Effect
   m_EditorClassIdentifier: Assembly-CSharp::FireTrailEffect
-  flameZonePrefab: {fileID: 0}
+  flameZonePrefab: {fileID: 6359800612356981073, guid: e62d69b83f1356c47a4552855f1bb2db, type: 3}
   spawnInterval: 0.12
   flameDuration: 1.8
   flameDamagePerStack: 3

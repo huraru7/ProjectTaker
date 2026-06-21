@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aafff0ac387d84036b49187cd4d491cc, type: 3}
-  m_Name: test
+  m_Name: AmmoModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
-  moduleName: testmodule
-  description: test^test^test
-  icon: {fileID: -1081386278238201723, guid: 57c095fb3d8121f4193c6ff29e0567be, type: 3}
-  moduleElement: 0
-  specialEffects: []
+  moduleName: "\u901F\u5C04\u6A5F\u69CB"
+  description: 
+  icon: {fileID: 0}
+  moduleElement: 2
+  specialEffects:
+  - {fileID: 11400000, guid: 4c64c582d0879c3498b0e73a7c237b6a, type: 2}

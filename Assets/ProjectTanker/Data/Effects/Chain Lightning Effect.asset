@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2cf42c17ce6e14448d1cc66819f773f, type: 3}
   m_Name: Chain Lightning Effect
   m_EditorClassIdentifier: Assembly-CSharp::ChainLightningEffect
-  chainBulletPrefab: {fileID: 0}
+  chainBulletPrefab: {fileID: 2114217309350105690, guid: 8fe24e7d67111b040992ea59416d8b3b, type: 3}
   damagePerStack: 4
   chainCount: 2
   chainRadius: 5
