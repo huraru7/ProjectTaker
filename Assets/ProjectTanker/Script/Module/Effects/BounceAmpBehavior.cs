@@ -37,7 +37,7 @@ public class BounceAmpBehavior : MonoBehaviour
         _bounceCount = 0;
     }
 
-    private void OnBounce()
+    private void OnBounce(Vector2 _)
     {
         if (!_active) return;
         _bounceCount++;

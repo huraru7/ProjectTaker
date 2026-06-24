@@ -10,24 +10,18 @@ public class CameraShake : MonoBehaviour
 {
     public static CameraShake Instance { get; private set; }
 
-    [SerializeField] private Transform _cameraTransform;
+    // MainCameraFollower が LateUpdate で読み取って最終位置に加算する
+    public Vector3 ShakeOffset { get; private set; }
 
-    void Awake()
-    {
-        Instance = this;
-        if (_cameraTransform == null)
-            _cameraTransform = Camera.main?.transform;
-    }
+    void Awake() => Instance = this;
 
     /// <summary>カメラを指定した強さ・時間でシェイクする。</summary>
     public void Shake(float strength = 0.3f, float duration = 0.25f)
     {
-        if (_cameraTransform == null) return;
-
         LMotion.Shake.Create(Vector3.zero, new Vector3(strength, strength, 0f), duration)
             .WithFrequency(12)
             .WithDampingRatio(1f)
-            .BindToLocalPosition(_cameraTransform)
+            .Bind(offset => ShakeOffset = offset)
             .AddTo(this);
     }
 }

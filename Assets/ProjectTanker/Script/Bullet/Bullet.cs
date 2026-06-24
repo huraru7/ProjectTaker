@@ -12,7 +12,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] private int _trailLength = 12;
 
     public event System.Action<Vector2, TankStatus> OnImpact;
-    public event System.Action OnWallBounce;
+    public event System.Action<Vector2> OnWallBounce;
     public int BonusDamage { get; set; }
 
     private float speed;
@@ -115,7 +115,7 @@ public class Bullet : MonoBehaviour
             Vector2 normal = contact.normal;
             _direction = Vector2.Reflect(_direction, normal);
             _rb.linearVelocity = _direction * speed;
-            OnWallBounce?.Invoke();
+            OnWallBounce?.Invoke(normal);
             return;
         }
 

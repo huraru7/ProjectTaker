@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: AttacModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u5F37\u5316\u5F3E\u982D"
-  description: 
-  icon: {fileID: 0}
+  description: "\u7832\u5F3E\u306E\u30C0\u30E1\u30FC\u30B8\u3092\u5897\u52A0\u3055\u305B\u308B"
+  icon: {fileID: -7842109258594384530, guid: d3d8636f96d2c614c91349ccf7021257, type: 3}
   moduleElement: 3
   specialEffects:
   - {fileID: 11400000, guid: 8846a01907d8b5e40851f740c3cdce13, type: 2}

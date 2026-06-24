@@ -49,6 +49,17 @@ public class TankPresenter : MonoBehaviour
             })
             .AddTo(this);
 
+        // プレイヤー被弾時のカメラシェイク
+        int prevHp = tankStatus.getHP.Value;
+        tankStatus.getHP
+            .Skip(1)
+            .Subscribe(hp =>
+            {
+                if (hp < prevHp) CameraShake.Instance?.Shake();
+                prevHp = hp;
+            })
+            .AddTo(this);
+
         // 初期表示
         slotUI.UpdateDisplay(tankModuleManager.Slots);
 

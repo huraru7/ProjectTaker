@@ -24,7 +24,7 @@ public class SplitShotBehavior : MonoBehaviour
         if (b != null) b.OnWallBounce -= OnWallBounce;
     }
 
-    private void OnWallBounce()
+    private void OnWallBounce(Vector2 wallNormal)
     {
         if (_hasSplit) return;
         _hasSplit = true;
@@ -35,6 +35,9 @@ public class SplitShotBehavior : MonoBehaviour
             float angle = Random.Range(0f, 360f);
             var dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad),
                                   Mathf.Sin(angle * Mathf.Deg2Rad));
+            // 壁に向かう方向は法線方向へ反転し、必ず壁から離れる半球に収める
+            if (Vector2.Dot(dir, wallNormal) < 0f)
+                dir = Vector2.Reflect(dir, wallNormal);
             var mini = Instantiate(_miniPrefab, spawnPos, Quaternion.identity);
             mini.GetComponent<MiniBullet>().Initialize(dir, _damage, _owner);
         }

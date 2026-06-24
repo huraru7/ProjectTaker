@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BounceAmpModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u30D0\u30A6\u30F3\u30B9\u30A2\u30F3\u30D7"
-  description: 
+  description: "\u7832\u5F3E\u304C\u58C1\u306B\u53CD\u5C04\u3059\u308B\u305F\u3073\u306B\u30C0\u30E1\u30FC\u30B8\u304C\u5897\u52A0\u3059\u308B\u3002"
   icon: {fileID: 0}
   moduleElement: 1
   specialEffects:

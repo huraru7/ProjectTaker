@@ -56,9 +56,8 @@ public class MainCameraFollower : MonoBehaviour
 
         _smoothedPosition = Vector3.Lerp(_smoothedPosition, newPosition, _smoothSpeed * Time.deltaTime);
 
-        Vector3 finalPosition = _smoothedPosition;
-
-        transform.position = finalPosition;
+        Vector3 shakeOffset = CameraShake.Instance != null ? CameraShake.Instance.ShakeOffset : Vector3.zero;
+        transform.position = _smoothedPosition + shakeOffset;
     }
 
     Vector3 ClampToBounds(Vector3 desiredPos)

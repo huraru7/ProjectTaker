@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ChainLightningModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u9023\u9396\u96FB\u6483"
-  description: 
-  icon: {fileID: 0}
+  description: "\u6575\u3092\u5012\u3059\u3068\u3001\u8FD1\u304F\u306E\u5225\u306E\u6575\u3078\u96FB\u6483\u304C\u9023\u9396\u3059\u308B\u3002"
+  icon: {fileID: -2140465817394758593, guid: 5ec43e6f8f80b164b8f959da0f3e4d24, type: 3}
   moduleElement: 4
   specialEffects:
   - {fileID: 11400000, guid: 6d1e826f1dccc614d9cdc75864fc4961, type: 2}

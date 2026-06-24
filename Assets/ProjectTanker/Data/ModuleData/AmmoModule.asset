@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AmmoModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u901F\u5C04\u6A5F\u69CB"
-  description: 
+  description: "\u5F3E\u5009\u5BB9\u91CF\u3092\u5897\u3084\u3057\u3001\u30EA\u30ED\u30FC\u30C9\u6642\u9593\u3092\u77ED\u7E2E\u3059\u308B\u3002"
   icon: {fileID: 0}
   moduleElement: 2
   specialEffects:

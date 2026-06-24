@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ArmorModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u9244\u58C1"
-  description: 
-  icon: {fileID: 0}
+  description: "\u6700\u5927HP\u3092\u5897\u52A0\u3055\u305B\u3001\u3088\u308A\u591A\u304F\u306E\u653B\u6483\u306B\u8010\u3048\u308B"
+  icon: {fileID: -4598343787381697379, guid: 9de3fd185a1e42f459df6165914a395b, type: 3}
   moduleElement: 1
   specialEffects:
   - {fileID: 11400000, guid: e31d4a246b31e8847b7d184ef6664b39, type: 2}

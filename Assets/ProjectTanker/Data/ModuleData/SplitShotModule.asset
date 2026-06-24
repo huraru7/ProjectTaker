@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SplitShotModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u5206\u88C2\u5F3E\u982D"
-  description: 
+  description: "\u7832\u5F3E\u304C\u58C1\u306B\u53CD\u5C04\u3057\u305F\u77AC\u9593\u3001\u8907\u6570\u306E\u5C0F\u5F3E\u306B\u5206\u88C2\u3057\u3066\u98DB\u3073\u6563\u308B\u3002"
   icon: {fileID: 0}
   moduleElement: 0
   specialEffects:

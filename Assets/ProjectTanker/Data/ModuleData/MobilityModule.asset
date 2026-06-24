@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MobilityModule
   m_EditorClassIdentifier: Assembly-CSharp::ModuleData
   moduleName: "\u6A5F\u52D5\u5236\u5FA1"
-  description: 
+  description: "\u79FB\u52D5\u901F\u5EA6\u3068\u65CB\u56DE\u901F\u5EA6\u3092\u5411\u4E0A\u3055\u305B\u308B\u3002"
   icon: {fileID: 0}
   moduleElement: 4
   specialEffects:
