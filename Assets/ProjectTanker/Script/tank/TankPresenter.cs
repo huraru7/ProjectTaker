@@ -49,6 +49,11 @@ public class TankPresenter : MonoBehaviour
             })
             .AddTo(this);
 
+        // カメラ視野サイズをステータスと同期
+        tankStatus.getCameraViewSize
+            .Subscribe(size => { if (Camera.main != null) Camera.main.orthographicSize = size; })
+            .AddTo(this);
+
         // プレイヤー被弾時のカメラシェイク
         int prevHp = tankStatus.getHP.Value;
         tankStatus.getHP

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f22670932235f443a819212e820bd23, type: 3}
   m_Name: Armor Effect
   m_EditorClassIdentifier: Assembly-CSharp::ArmorEffect
-  hpBonus: 20
+  hpBonus: 2

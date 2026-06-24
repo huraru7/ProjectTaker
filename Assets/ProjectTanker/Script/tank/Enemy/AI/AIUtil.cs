@@ -100,6 +100,14 @@ public static class AIUtil
             RaycastHit2D pathCheck = Physics2D.Raycast(bounceOrigin, toTarget, distToTarget);
             if (pathCheck && pathCheck.collider.TryGetComponent<Wall>(out _)) continue;
 
+            // 反射後の経路が発射元（from）を通過しないか確認
+            Vector2 toSelf = from - bounceOrigin;
+            if (Vector2.Dot(toSelf, toTarget) > 0f)
+            {
+                float distToRay = Mathf.Abs(toSelf.x * toTarget.y - toSelf.y * toTarget.x);
+                if (distToRay < 0.6f) continue;
+            }
+
             shootDir = dir;
             return true;
         }

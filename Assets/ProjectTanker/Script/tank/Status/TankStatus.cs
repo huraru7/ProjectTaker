@@ -16,6 +16,7 @@ public class TankStatus : MonoBehaviour
     [SerializeField] private SerializableReactiveProperty<int> magazineCapacity;
     [SerializeField] private SerializableReactiveProperty<float> reloadTime;
     [SerializeField] private SerializableReactiveProperty<float> barrelTurnRate;
+    [SerializeField] private SerializableReactiveProperty<float> cameraViewSize;
 
     private Subject<Unit> _onDead = new();
     public Observable<Unit> OnDead => _onDead;
@@ -29,6 +30,7 @@ public class TankStatus : MonoBehaviour
     public SerializableReactiveProperty<float> getBulletSpeed => bulletSpeed;
     public SerializableReactiveProperty<float> getReloadTime => reloadTime;
     public SerializableReactiveProperty<float> getBarrelTurnRate => barrelTurnRate;
+    public SerializableReactiveProperty<float> getCameraViewSize => cameraViewSize;
 
     void Awake()
     {
@@ -47,6 +49,7 @@ public class TankStatus : MonoBehaviour
         magazineCapacity = new(data.magazineCapacity);
         reloadTime = new(data.reloadTime);
         barrelTurnRate = new(data.barrelTurnRate);
+        cameraViewSize = new(data.cameraViewSize);
     }
 
     /// <summary>
@@ -63,6 +66,7 @@ public class TankStatus : MonoBehaviour
         magazineCapacity.Value = data.magazineCapacity;
         reloadTime.Value = data.reloadTime;
         barrelTurnRate.Value = data.barrelTurnRate;
+        cameraViewSize.Value = data.cameraViewSize;
     }
 
     /// <summary>
@@ -78,6 +82,7 @@ public class TankStatus : MonoBehaviour
         magazineCapacity.Value = data.magazineCapacity;
         reloadTime.Value = data.reloadTime;
         barrelTurnRate.Value = data.barrelTurnRate;
+        cameraViewSize.Value = data.cameraViewSize;
     }
 
     public void DealDamage(int amount)

@@ -121,6 +121,7 @@ public class Bullet : MonoBehaviour
 
         if (collision.gameObject.TryGetComponent<BulletManagerBase>(out var bulletManager))
         {
+            if (bulletManager == _owner) return;
             var targetStatus = collision.gameObject.GetComponentInParent<TankStatus>();
             bulletManager.TakeDamage(damage + BonusDamage);
             if (targetStatus != null)

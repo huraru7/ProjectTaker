@@ -3,17 +3,17 @@ using UnityEngine;
 public class SplitShotController : MonoBehaviour
 {
     private TankBulletManager _bm;
-    private GameObject        _miniPrefab;
-    private int               _miniCount;
+    private GameObject        _explosionPrefab;
+    private float             _radius;
     private int               _damage;
     private TankStatus        _owner;
 
-    public void Setup(GameObject miniPrefab, int miniCount, int damage, TankStatus owner)
+    public void Setup(GameObject explosionPrefab, float radius, int damage, TankStatus owner)
     {
-        _miniPrefab = miniPrefab;
-        _miniCount  = miniCount;
-        _damage     = damage;
-        _owner      = owner;
+        _explosionPrefab = explosionPrefab;
+        _radius = radius;
+        _damage = damage;
+        _owner  = owner;
 
         if (_bm == null)
         {
@@ -32,6 +32,6 @@ public class SplitShotController : MonoBehaviour
         var existing = bullet.GetComponent<SplitShotBehavior>();
         if (existing != null) Destroy(existing);
         bullet.gameObject.AddComponent<SplitShotBehavior>()
-            .Initialize(_miniPrefab, _miniCount, _damage, _owner);
+            .Initialize(_explosionPrefab, _radius, _damage, _owner);
     }
 }

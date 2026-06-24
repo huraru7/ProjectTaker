@@ -16,4 +16,7 @@ public class TankData : ScriptableObject
 
     [Header("Barrel")]
     [Tooltip("バレル回転速度（度/秒）")] public float barrelTurnRate = 120f;
+
+    [Header("Camera")]
+    [Tooltip("カメラの表示範囲（Orthographic Size）")] public float cameraViewSize = 5f;
 }

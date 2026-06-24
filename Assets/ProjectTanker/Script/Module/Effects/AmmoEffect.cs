@@ -3,17 +3,11 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Data/Effects/AmmoEffect")]
 public class AmmoEffect : SpecialEffect
 {
-    [SerializeField] private int   magBonus        = 1;
-    [SerializeField] private float reloadReduction = 0.3f;
-    [SerializeField] private float minReloadTime   = 0.2f;
+    [Tooltip("1スタックあたりのカメラ視野拡大量（Orthographic Size 加算値）")]
+    [SerializeField] private float viewSizeBonus = 1.5f;
 
     public override void Apply(TankStatus status, int stackCount)
-    {
-        status.getMagazineCapacity.Value += magBonus * stackCount;
-        status.getReloadTime.Value = Mathf.Max(
-            minReloadTime,
-            status.getReloadTime.Value - reloadReduction * stackCount);
-    }
+        => status.getCameraViewSize.Value += viewSizeBonus * stackCount;
 
     public override void Remove(TankStatus status) { }
 }
