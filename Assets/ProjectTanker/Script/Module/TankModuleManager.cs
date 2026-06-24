@@ -10,6 +10,10 @@ public class TankModuleManager : MonoBehaviour
     [Tooltip("装備slot")] private ModuleData[] slots = new ModuleData[7];
     public IReadOnlyList<ModuleData> Slots => slots;
 
+    [Tooltip("ゲーム全体で共有・消費されるリロール回数")]
+    [SerializeField] private int maxRerollCount = 3;
+    private int _rerollCount;
+
     private Dictionary<ModuleData, int> stackCounts = new();
 
     private readonly Subject<ModuleData[]> _onModuleCandidatesGenerated = new();
@@ -18,11 +22,35 @@ public class TankModuleManager : MonoBehaviour
     private readonly Subject<IReadOnlyList<ModuleData>> _onSlotsChanged = new();
     public Observable<IReadOnlyList<ModuleData>> OnSlotsChanged => _onSlotsChanged;
 
+    private readonly Subject<int> _onRerollCountChanged = new();
+    public Observable<int> OnRerollCountChanged => _onRerollCountChanged;
+
+    // 3択UIが表示中かどうか。表示中に追加でレベルが上がった場合は獲得をキューへ積む
+    private bool _isSelectionPending;
+    private int  _queuedEarns;
+
+    void Awake()
+    {
+        _rerollCount = maxRerollCount;
+    }
+
     /// <summary>
-    /// 3択候補を生成して Presenter へ通知する
+    /// 3択候補を生成して Presenter へ通知する。既に選択中なら完了後に表示するためキューへ積む
     /// </summary>
     public void ModuleEarn()
     {
+        if (_isSelectionPending)
+        {
+            _queuedEarns++;
+            return;
+        }
+        GenerateAndEmitCandidates();
+    }
+
+    private void GenerateAndEmitCandidates()
+    {
+        _isSelectionPending = true;
+
         List<ModuleData> pool = new(moduleLists);
         ModuleData[] candidates = new ModuleData[Mathf.Min(3, pool.Count)];
         for (int i = 0; i < candidates.Length; i++)
@@ -32,6 +60,31 @@ public class TankModuleManager : MonoBehaviour
             pool.RemoveAt(idx);
         }
         _onModuleCandidatesGenerated.OnNext(candidates);
+        _onRerollCountChanged.OnNext(_rerollCount);
+    }
+
+    /// <summary>
+    /// リロール残数を1消費して3択を再抽選する。残数が無ければ何もしない。
+    /// </summary>
+    public void RerollCandidates()
+    {
+        if (_rerollCount <= 0) return;
+        _rerollCount--;
+        GenerateAndEmitCandidates();
+    }
+
+    /// <summary>
+    /// 3択UIでの選択〜装備（またはスロット入れ替えの決定）が完了した際に Presenter から呼ぶ。
+    /// 保留中の獲得があれば次の3択を続けて表示する。
+    /// </summary>
+    public void NotifySelectionResolved()
+    {
+        _isSelectionPending = false;
+        if (_queuedEarns > 0)
+        {
+            _queuedEarns--;
+            GenerateAndEmitCandidates();
+        }
     }
 
     /// <summary>
@@ -96,5 +149,6 @@ public class TankModuleManager : MonoBehaviour
     {
         _onModuleCandidatesGenerated.Dispose();
         _onSlotsChanged.Dispose();
+        _onRerollCountChanged.Dispose();
     }
 }

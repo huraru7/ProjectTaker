@@ -28,6 +28,7 @@ public class TankPresenter : MonoBehaviour
                 if (tankModuleManager.TryAutoEquip(selected))
                 {
                     _pendingModule = null;
+                    tankModuleManager.NotifySelectionResolved();
                 }
                 else
                 {
@@ -44,6 +45,7 @@ public class TankPresenter : MonoBehaviour
                 if (slotIndex >= 0 && _pendingModule != null)
                     tankModuleManager.SetModule(slotIndex, _pendingModule);
                 _pendingModule = null;
+                tankModuleManager.NotifySelectionResolved();
             })
             .AddTo(this);
 
@@ -53,6 +55,16 @@ public class TankPresenter : MonoBehaviour
         // Model→View: スロットが変化したら一覧を更新
         tankModuleManager.OnSlotsChanged
             .Subscribe(slots => slotUI.UpdateDisplay(slots))
+            .AddTo(this);
+
+        // Model→View: リロール残数が変化したら表示更新
+        tankModuleManager.OnRerollCountChanged
+            .Subscribe(count => getModuleSelectUI.UpdateRerollCount(count))
+            .AddTo(this);
+
+        // View→Model: リロール要求を受け取る
+        getModuleSelectUI.OnRerollRequested
+            .Subscribe(_ => tankModuleManager.RerollCandidates())
             .AddTo(this);
     }
 }

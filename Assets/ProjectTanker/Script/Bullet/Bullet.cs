@@ -123,7 +123,8 @@ public class Bullet : MonoBehaviour
         {
             var targetStatus = collision.gameObject.GetComponentInParent<TankStatus>();
             bulletManager.TakeDamage(damage + BonusDamage);
-            OnImpact?.Invoke(transform.position, targetStatus);
+            if (targetStatus != null)
+                OnImpact?.Invoke(transform.position, targetStatus);
             if (_owner != null) _owner.ReturnBullet(this);
         }
     }

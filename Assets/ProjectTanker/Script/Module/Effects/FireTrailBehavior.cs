@@ -11,7 +11,11 @@ public class FireTrailBehavior : MonoBehaviour
         StartCoroutine(SpawnCo(prefab, interval, duration, damage, owner));
     }
 
-    void OnDisable() => _active = false;
+    void OnDisable()
+    {
+        _active = false;
+        StopAllCoroutines();
+    }
 
     private IEnumerator SpawnCo(GameObject prefab, float interval, float duration, int damage, TankStatus owner)
     {

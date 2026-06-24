@@ -60,7 +60,9 @@ Shader "ProjectTanker/WallTile"
             half4 frag(Varyings IN) : SV_Target
             {
                 half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                // _Color で全面を塗る（不透明）
+                // 三角タイルなどの透明部分を切り抜く（アルファテスト）
+                clip(tex.a - 0.5);
+                // _Color で不透明部分を塗る
                 return half4(_Color.rgb * IN.color.rgb, 1.0);
             }
             ENDHLSL

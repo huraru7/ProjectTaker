@@ -10,6 +10,7 @@ public class ModuleOptionButton : MonoBehaviour
     [SerializeField] private Button button;
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI nameText;
+    [SerializeField] private TextMeshProUGUI descriptionText;
     [SerializeField] private Image accentBar;   // カード上部の属性カラーバー
     [SerializeField] private ThemeColor theme;
     [SerializeField] private CanvasGroup canvasGroup;
@@ -20,6 +21,7 @@ public class ModuleOptionButton : MonoBehaviour
     {
         iconImage.sprite = data.icon;
         nameText.text = data.moduleName;
+        if (descriptionText != null) descriptionText.text = data.description;
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(() => onSelect?.Invoke());
         button.interactable = true;

@@ -1,6 +1,9 @@
 using LitMotion;
 using R3;
+using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class GetModuleSelectUI : MonoBehaviour
 {
@@ -10,8 +13,36 @@ public class GetModuleSelectUI : MonoBehaviour
     [SerializeField] private CanvasGroup panelCanvasGroup;
     [SerializeField] private float staggerDelay = 0.08f;
 
+    [Header("リロール")]
+    [SerializeField] private Button rerollButton;
+    [SerializeField] private TextMeshProUGUI rerollCountText;
+
+    private MotionHandle _panelFadeHandle;
+
     private readonly Subject<ModuleData> _onModuleSelected = new();
     public Observable<ModuleData> OnModuleSelected => _onModuleSelected;
+
+    private readonly Subject<Unit> _onRerollRequested = new();
+    public Observable<Unit> OnRerollRequested => _onRerollRequested;
+
+    void Awake()
+    {
+        if (rerollButton != null)
+            rerollButton.onClick.AddListener(() => _onRerollRequested.OnNext(Unit.Default));
+    }
+
+    void Update()
+    {
+        if (panel.activeSelf && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+            _onRerollRequested.OnNext(Unit.Default);
+    }
+
+    /// <summary>リロール残数の表示を更新する　Presenterから呼ばれる</summary>
+    public void UpdateRerollCount(int count)
+    {
+        if (rerollCountText != null) rerollCountText.text = $"リロール ({count})";
+        if (rerollButton != null) rerollButton.interactable = count > 0;
+    }
 
     /// <summary>
     /// 3択UIを表示する　Presenterから呼ばれる
@@ -22,8 +53,9 @@ public class GetModuleSelectUI : MonoBehaviour
 
         if (panelCanvasGroup != null)
         {
+            if (_panelFadeHandle.IsActive()) _panelFadeHandle.Cancel();
             panelCanvasGroup.alpha = 0f;
-            LMotion.Create(0f, 1f, 0.2f)
+            _panelFadeHandle = LMotion.Create(0f, 1f, 0.2f)
                 .Bind(a => panelCanvasGroup.alpha = a)
                 .AddTo(this);
         }
@@ -61,5 +93,9 @@ public class GetModuleSelectUI : MonoBehaviour
         _onModuleSelected.OnNext(chosen);
     }
 
-    private void OnDestroy() => _onModuleSelected.Dispose();
+    private void OnDestroy()
+    {
+        _onModuleSelected.Dispose();
+        _onRerollRequested.Dispose();
+    }
 }

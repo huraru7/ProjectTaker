@@ -2,105 +2,79 @@
 
 ---
 
-## モジュールシステム初期セットアップ
+## モジュール3択UI ビジュアル刷新（説明文＋リロール機能）
 
-スクリプトはすべて実装済み。以下の手順で ScriptableObject アセット・Prefab を作成し、
-TankModuleManager に登録することで動作する。
-
----
-
-## ① SpecialEffect アセットの作成（8種）
-
-`Project ウィンドウ → 右クリック → Create > Data/Effects/XXX` で各アセットを作成する。
-
-| 作成メニュー | ファイル名（推奨） | 変更するパラメータ |
-|---|---|---|
-| `Data/Effects/AttackBoostEffect` | `AttackBoostEffect.asset` | Attack Bonus（デフォルト 5） |
-| `Data/Effects/ArmorEffect` | `ArmorEffect.asset` | Hp Bonus（デフォルト 20） |
-| `Data/Effects/MobilityEffect` | `MobilityEffect.asset` | Speed/Turn Bonus（デフォルト 1/20） |
-| `Data/Effects/AmmoEffect` | `AmmoEffect.asset` | Mag Bonus / Reload Reduction（デフォルト 1/0.3） |
-| `Data/Effects/FireTrailEffect` | `FireTrailEffect.asset` | Flame Zone Prefab をセット、他はデフォルト可 |
-| `Data/Effects/ChainLightningEffect` | `ChainLightningEffect.asset` | Chain Bullet Prefab をセット、他はデフォルト可 |
-| `Data/Effects/SplitShotEffect` | `SplitShotEffect.asset` | Mini Prefab をセット、他はデフォルト可 |
-| `Data/Effects/BounceAmpEffect` | `BounceAmpEffect.asset` | Bonus Per Bounce（デフォルト 3） |
-
-> **注意**: FireTrail / ChainLightning / SplitShot は Prefab のセットが必要（手順③参照）。
+スクリプトはすべて実装済み。`ModuleOptionButton` への参照セットと、UI階層への要素追加が必要。
 
 ---
 
-## ② Prefab の作成（3種）
+## ① ModuleOptionButton プレハブへの要素追加
 
-### FlameZone Prefab
-
-```
-FlameZone (GameObject)
-├── FlameZone.cs
-├── CircleCollider2D → Is Trigger = TRUE, Radius = 0.4
-└── SpriteRenderer（炎スプライト、任意）
-```
-
-作成後、`FireTrailEffect.asset` の **Flame Zone Prefab** フィールドにドラッグ。
-
-### MiniBullet Prefab
+各カードに Divider（区切り線）と DescriptionText（説明文）を追加する。
 
 ```
-MiniBullet (GameObject)
-├── MiniBullet.cs
-├── Rigidbody2D → Gravity Scale = 0, Collision Detection = Continuous
-├── CircleCollider2D → Radius = 0.1
-└── SpriteRenderer（小さな丸スプライト）
+OptionButton
+├── AccentBar（上部の細い属性カラーバー：既存）
+├── IconImage（アイコン、中央：既存）
+├── NameText（モジュール名、中央太字：既存）
+├── Divider（新規：細い横線 Image、NameTextの下）
+└── DescriptionText（新規：説明文、2行、中央揃え小さめフォント）
 ```
 
-作成後、`SplitShotEffect.asset` の **Mini Prefab** フィールドにドラッグ。
-
-### ChainBullet Prefab
-
-```
-ChainBullet (GameObject)
-├── ChainBullet.cs
-└── SpriteRenderer（小さな光点スプライト）
-```
-
-作成後、`ChainLightningEffect.asset` の **Chain Bullet Prefab** フィールドにドラッグ。
+作成後、`ModuleOptionButton` コンポーネントの **Description Text** フィールドに `DescriptionText` をセットする（3枚すべてのカードで実施）。
 
 ---
 
-## ③ ModuleData アセットの作成（8種）
+## ② パネルのタイトル装飾
 
-`Project ウィンドウ → 右クリック → Create > Data/Create ModuleData` で各アセットを作成する。
-
-| Asset 名（推奨） | Module Name | Element | Special Effects にセット |
-|---|---|---|---|
-| `AttackModule.asset` | 強化弾頭 | Fire | AttackBoostEffect.asset |
-| `ArmorModule.asset` | 鉄壁 | Earth | ArmorEffect.asset |
-| `MobilityModule.asset` | 機動制御 | Wind | MobilityEffect.asset |
-| `AmmoModule.asset` | 速射機構 | Water | AmmoEffect.asset |
-| `FlameTrailModule.asset` | フレイムトレイル | Fire | FireTrailEffect.asset |
-| `ChainLightningModule.asset` | 連鎖電撃 | Wind | ChainLightningEffect.asset |
-| `SplitShotModule.asset` | 分裂弾頭 | None | SplitShotEffect.asset |
-| `BounceAmpModule.asset` | バウンスアンプ | Earth | BounceAmpEffect.asset |
+`GetModuleSelectUI` の `panel` 上部に、静的テキスト「アップグレードを選択」と左右の装飾的なダッシュ（"···─" 等）を追加する。コード参照は不要（見た目のみ）。
 
 ---
 
-## ④ TankModuleManager への登録
+## ③ Reroll 行の追加
 
-1. Hierarchy でプレイヤータンクの GameObject を選択
-2. `TankModuleManager` コンポーネントの **Module Lists** リストを開く
-3. 上記 8 つの ModuleData アセットをすべて追加する
+`GetModuleSelectUI` の `panel` 内、カード群の下に以下を追加する。
+
+```
+RerollRow
+├── RKeyBadge（"R" と表示する小さな角丸 Image、装飾）
+├── RerollCountText（"リロール (3)" 表示用 TextMeshProUGUI）
+└── Button コンポーネント（RerollRow か親 GameObject に付与）
+```
+
+作成後、`GetModuleSelectUI` コンポーネントの Inspector で以下をセット：
+
+| フィールド | 設定内容 |
+|---|---|
+| Reroll Button | 上記 Button コンポーネント |
+| Reroll Count Text | `RerollCountText` |
+
+---
+
+## ④ ThemeColor の確認
+
+`ThemeColor` アセットの `earth`/`wind`/`fire` が以下に近いか確認・調整する。
+
+| Element | 色 |
+|---|---|
+| Earth | 緑 |
+| Wind | 黄 |
+| Fire | 赤 |
+
+---
+
+## ⑤ TankModuleManager の設定
+
+Hierarchy でプレイヤータンクを選択 → `TankModuleManager` の **Max Reroll Count** を確認（デフォルト 3、好みで調整可）。
 
 ---
 
 ## 動作確認
 
-| 操作 | 期待する結果 |
+| 確認 | 期待 |
 |---|---|
-| レベルアップ（経験値取得） | 3択のモジュール選択 UI が表示される |
-| 強化弾頭を選択 | 弾のダメージが +5 される |
-| 鉄壁を選択 | 最大 HP が +20 される |
-| 機動制御を選択 | 移動・旋回速度が上がる |
-| 速射機構を選択 | マガジン容量 +1、リロードが速くなる |
-| フレイムトレイルを選択 | 弾の後ろに炎ゾーンが出現し、触れた敵にダメージ |
-| 連鎖電撃を選択 | 敵を倒したとき、近くの敵へ電撃弾が自動追尾する |
-| 分裂弾頭を選択 | 弾が壁に当たった瞬間、ミニ弾 3 発がランダム方向へ飛ぶ |
-| バウンスアンプを選択 | 壁反射ごとに弾がオレンジ→赤に変色・拡大し、敵へのダメージが増える |
-| 同じモジュールを 2 つ装備 | 効果が 2 倍になる（stack=2） |
+| 3択UIを開く | 各カードに説明文が表示される、下部に「リロール (3)」ボタンが出る |
+| リロールボタンをクリック | 3枚とも新しい候補に変わり、ポップイン演出が再生される。残数が「リロール (2)」になる |
+| Rキーを押す | クリックと同じ効果でリロールされる |
+| 残数が0になる | ボタンが非活性になり、Rキーを押しても何も起きない |
+| 別のレベルアップで3択を再度開く | リロール残数は前回の続きから（リセットされない） |

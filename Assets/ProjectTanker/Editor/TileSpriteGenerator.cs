@@ -108,7 +108,8 @@ public static class TileSpriteGenerator
         // アトラスパッキングを無効化（UV が 0-1 になるよう保証）
         var settings = new TextureImporterSettings();
         importer.ReadTextureSettings(settings);
-        settings.spriteMeshType = SpriteMeshType.FullRect;
+        // 三角形の輪郭に沿ったメッシュを生成する（FullRectだと常に正方形メッシュになり見た目が斜めにならない）
+        settings.spriteMeshType = SpriteMeshType.Tight;
         importer.SetTextureSettings(settings);
 
         importer.SaveAndReimport();
