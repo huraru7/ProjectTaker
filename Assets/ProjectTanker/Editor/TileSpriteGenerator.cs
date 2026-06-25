@@ -52,6 +52,84 @@ public static class TileSpriteGenerator
                   $"保存先: {TileFolder}");
     }
 
+    [MenuItem("Tools/ProjectTanker/Generate Half Block Tiles")]
+    public static void GenerateHalfBlocks()
+    {
+        string absFolder = Application.dataPath + "/ProjectTanker/Art/Tiles";
+        Directory.CreateDirectory(absFolder);
+
+        // ──────────────────────────────────────────
+        // 端揃えハーフブロック（タイルの端にぴったり付く）
+        //
+        // pivot はトリミング後矩形内での正規化座標。
+        // タイルセル中心 (64,64px) がトリミング後 Rect のどこにあるかで決まる。
+        //   Top    : trimmed = y:64-127 → セル中心は trimmed の底辺 → pivot.y = 0
+        //   Bottom : trimmed = y:0-63  → セル中心は trimmed の天辺 → pivot.y = 1
+        //   Right  : trimmed = x:64-127 → セル中心は trimmed の左辺 → pivot.x = 0
+        //   Left   : trimmed = x:0-63  → セル中心は trimmed の右辺 → pivot.x = 1
+        // ──────────────────────────────────────────
+        var edgeHalves = new[]
+        {
+            (name: "HalfBlock_Top",    xMin: 0f,   xMax: 1f,   yMin: 0.5f, yMax: 1f,   pivot: new Vector2(0.5f, 0f  )),
+            (name: "HalfBlock_Bottom", xMin: 0f,   xMax: 1f,   yMin: 0f,   yMax: 0.5f, pivot: new Vector2(0.5f, 1f  )),
+            (name: "HalfBlock_Right",  xMin: 0.5f, xMax: 1f,   yMin: 0f,   yMax: 1f,   pivot: new Vector2(0f,   0.5f)),
+            (name: "HalfBlock_Left",   xMin: 0f,   xMax: 0.5f, yMin: 0f,   yMax: 1f,   pivot: new Vector2(1f,   0.5f)),
+        };
+
+        // ──────────────────────────────────────────
+        // 中央寄せハーフブロック（タイルセルの中心に浮いた見た目）
+        // 上下の 2 種のみ。pivot = (0.5, 0.5) → trimmed Rect の中心がセル中心に来る
+        // ──────────────────────────────────────────
+        var centerHalves = new[]
+        {
+            (name: "HalfBlock_Top_Center",    xMin: 0f, xMax: 1f, yMin: 0.5f, yMax: 1f  ),
+            (name: "HalfBlock_Bottom_Center", xMin: 0f, xMax: 1f, yMin: 0f,   yMax: 0.5f),
+        };
+
+        foreach (var h in edgeHalves)
+            SavePng(absFolder, h.name, BuildRectTex(h.xMin, h.xMax, h.yMin, h.yMax));
+        foreach (var h in centerHalves)
+            SavePng(absFolder, h.name, BuildRectTex(h.xMin, h.xMax, h.yMin, h.yMax));
+
+        AssetDatabase.Refresh();
+
+        foreach (var h in edgeHalves)
+            ApplyHalfBlockEdgeImportSettings($"{TileFolder}/{h.name}.png", h.pivot);
+        foreach (var h in centerHalves)
+            ApplySpriteImportSettings($"{TileFolder}/{h.name}.png");
+
+        AssetDatabase.Refresh();
+
+        foreach (var h in edgeHalves)  CreateTileAsset(h.name);
+        foreach (var h in centerHalves) CreateTileAsset(h.name);
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log("[TileSpriteGenerator] ハーフブロック 6 種（端揃え 4 種 + 中央寄せ 2 種）を生成しました。\n" +
+                  $"保存先: {TileFolder}");
+    }
+
+    static void ApplyHalfBlockEdgeImportSettings(string assetPath, Vector2 pivot)
+    {
+        var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+        if (importer == null) return;
+
+        importer.textureType         = TextureImporterType.Sprite;
+        importer.spritePixelsPerUnit = Size;
+        importer.filterMode          = FilterMode.Bilinear;
+        importer.alphaIsTransparency = true;
+        importer.mipmapEnabled       = false;
+
+        var settings = new TextureImporterSettings();
+        importer.ReadTextureSettings(settings);
+        settings.spriteMeshType = SpriteMeshType.FullRect;
+        settings.spritePivot    = pivot;   // spriteAlignment は廃止済みのため pivot のみ設定
+        importer.SetTextureSettings(settings);
+
+        importer.SaveAndReimport();
+    }
+
     // ── テクスチャ生成 ──────────────────────────────
 
     static Texture2D BuildTriangleTex(Vector2 a, Vector2 b, Vector2 c)
@@ -65,6 +143,26 @@ public static class TileSpriteGenerator
             float u = (x + 0.5f) / Size;
             float v = (y + 0.5f) / Size;
             pixels[y * Size + x] = PointInTriangle(new Vector2(u, v), a, b, c)
+                ? Color.white
+                : Color.clear;
+        }
+
+        tex.SetPixels(pixels);
+        tex.Apply();
+        return tex;
+    }
+
+    static Texture2D BuildRectTex(float xMin, float xMax, float yMin, float yMax)
+    {
+        var tex    = new Texture2D(Size, Size, TextureFormat.RGBA32, false);
+        var pixels = new Color[Size * Size];
+
+        for (int y = 0; y < Size; y++)
+        for (int x = 0; x < Size; x++)
+        {
+            float u = (x + 0.5f) / Size;
+            float v = (y + 0.5f) / Size;
+            pixels[y * Size + x] = (u >= xMin && u <= xMax && v >= yMin && v <= yMax)
                 ? Color.white
                 : Color.clear;
         }
@@ -94,7 +192,10 @@ public static class TileSpriteGenerator
 
     // ── インポート設定 ──────────────────────────────
 
-    static void ApplySpriteImportSettings(string assetPath)
+    // Tight  : 三角形など斜め形状に使用（ピクセル輪郭に沿ったメッシュ）
+    // FullRect: ハーフブロックなど矩形に使用（全体を保持しないと pivot がずれる）
+    static void ApplySpriteImportSettings(string assetPath,
+        SpriteMeshType meshType = SpriteMeshType.Tight)
     {
         var importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
         if (importer == null) return;
@@ -105,11 +206,9 @@ public static class TileSpriteGenerator
         importer.alphaIsTransparency  = true;
         importer.mipmapEnabled        = false;
 
-        // アトラスパッキングを無効化（UV が 0-1 になるよう保証）
         var settings = new TextureImporterSettings();
         importer.ReadTextureSettings(settings);
-        // 三角形の輪郭に沿ったメッシュを生成する（FullRectだと常に正方形メッシュになり見た目が斜めにならない）
-        settings.spriteMeshType = SpriteMeshType.Tight;
+        settings.spriteMeshType = meshType;
         importer.SetTextureSettings(settings);
 
         importer.SaveAndReimport();

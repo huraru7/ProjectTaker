@@ -13,6 +13,6 @@ public class DebugController : MonoBehaviour
 
     void Start()
     {
-        NotificationManager.Show("これがテストメッセージ、最も完璧です。");
+
     }
 }

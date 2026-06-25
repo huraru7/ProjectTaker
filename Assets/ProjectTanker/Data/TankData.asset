@@ -20,3 +20,4 @@ MonoBehaviour:
   magazineCapacity: 5
   reloadTime: 5
   barrelTurnRate: 120
+  cameraViewSize: 6
