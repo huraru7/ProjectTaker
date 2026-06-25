@@ -116,6 +116,7 @@ public class Bullet : MonoBehaviour
             _direction = Vector2.Reflect(_direction, normal);
             _rb.linearVelocity = _direction * speed;
             OnWallBounce?.Invoke(normal);
+            AudioManager.Instance?.PlayBounce();
             return;
         }
 

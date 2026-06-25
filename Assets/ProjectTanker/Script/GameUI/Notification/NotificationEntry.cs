@@ -18,6 +18,7 @@ public class NotificationEntry : MonoBehaviour
     private RectTransform _rt;
     private CanvasGroup   _cg;
     private MotionHandle  _moveHandle;
+    private MotionHandle  _alphaHandle;
 
     public float Height => _rt.rect.height;
 
@@ -46,7 +47,7 @@ public class NotificationEntry : MonoBehaviour
         _cg.alpha            = 0f;
         _rt.anchoredPosition = new Vector2(startX, _rt.anchoredPosition.y);
 
-        LMotion.Create(0f, 1f, slideInDuration)
+        _alphaHandle = LMotion.Create(0f, 1f, slideInDuration)
             .WithEase(Ease.OutCubic)
             .Bind(v => _cg.alpha = v)
             .AddTo(this);
@@ -59,8 +60,20 @@ public class NotificationEntry : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(slideInDuration + duration);
 
-        // フェードアウト開始後、終了まで待ってから破棄
-        LMotion.Create(1f, 0f, fadeOutDuration)
+        yield return FadeOutAndDestroyCo();
+    }
+
+    /// <summary>外部から即座にフェードアウトして破棄する。</summary>
+    public void Dismiss()
+    {
+        StopAllCoroutines();
+        StartCoroutine(FadeOutAndDestroyCo());
+    }
+
+    private IEnumerator FadeOutAndDestroyCo()
+    {
+        if (_alphaHandle.IsActive()) _alphaHandle.Cancel();
+        _alphaHandle = LMotion.Create(_cg.alpha, 0f, fadeOutDuration)
             .WithEase(Ease.InCubic)
             .Bind(v => _cg.alpha = v)
             .AddTo(this);

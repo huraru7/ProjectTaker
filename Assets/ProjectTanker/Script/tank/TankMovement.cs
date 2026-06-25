@@ -17,6 +17,7 @@ public class TankMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 move;
+    private bool _wasMoving;
 
     private void Awake()
     {
@@ -51,6 +52,14 @@ public class TankMovement : MonoBehaviour
     private void FixedUpdate()
     {
         rb.angularVelocity = 0f;
+
+        bool isMoving = move != Vector2.zero;
+        if (isMoving != _wasMoving)
+        {
+            if (isMoving) AudioManager.Instance?.StartMoveLoop();
+            else          AudioManager.Instance?.StopMoveLoop();
+            _wasMoving = isMoving;
+        }
 
         if (move != Vector2.zero)
         {

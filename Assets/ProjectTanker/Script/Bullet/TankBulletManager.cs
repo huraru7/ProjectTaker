@@ -179,6 +179,7 @@ public class TankBulletManager : BulletManagerBase
         b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value);
         totalRounds.Value--;
         OnBulletFired?.Invoke(b);
+        AudioManager.Instance?.PlayShoot();
     }
 
     public override void Fire()

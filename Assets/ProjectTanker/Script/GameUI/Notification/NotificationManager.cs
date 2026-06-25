@@ -19,7 +19,7 @@ public class NotificationManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        _subject.Subscribe(ShowInternal).AddTo(this);
+        _subject.Subscribe(data => ShowInternal(data)).AddTo(this);
     }
 
     // ----------------------------------------------------------------
@@ -31,6 +31,10 @@ public class NotificationManager : MonoBehaviour
 
     public static void Show(NotificationData data) =>
         Instance?._subject.OnNext(data);
+
+    /// <summary>通知を表示し、後から Dismiss() できるよう NotificationEntry を返す。</summary>
+    public static NotificationEntry ShowEntry(NotificationData data) =>
+        Instance != null ? Instance.ShowInternal(data) : null;
 
     public static void Tutorial(string message, Sprite icon = null) =>
         Show(NotificationData.Tutorial(message, icon));
@@ -45,14 +49,14 @@ public class NotificationManager : MonoBehaviour
     // Internal
     // ----------------------------------------------------------------
 
-    private void ShowInternal(NotificationData data)
+    private NotificationEntry ShowInternal(NotificationData data)
     {
-        // 上限超過時は最古（末尾）を削除
+        // 上限超過時は最古（末尾）をフェードアウトして削除
         if (_active.Count >= maxEntries)
         {
-            int last = _active.Count - 1;
-            Destroy(_active[last].gameObject);
-            _active.RemoveAt(last);
+            var oldest = _active[_active.Count - 1];
+            _active.RemoveAt(_active.Count - 1);
+            oldest.Dismiss();
         }
 
         var entry = Instantiate(entryPrefab, container);
@@ -66,6 +70,7 @@ public class NotificationManager : MonoBehaviour
         _active.Insert(0, entry);
 
         RearrangeEntries();
+        return entry;
     }
 
     // NotificationEntry の OnDestroy から呼ばれる

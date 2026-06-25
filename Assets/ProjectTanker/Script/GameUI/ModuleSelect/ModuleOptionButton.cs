@@ -2,10 +2,11 @@ using System;
 using LitMotion;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ProjectTanker.UI;
 
-public class ModuleOptionButton : MonoBehaviour
+public class ModuleOptionButton : MonoBehaviour, IPointerEnterHandler
 {
     [SerializeField] private Button button;
     [SerializeField] private Image iconImage;
@@ -16,6 +17,11 @@ public class ModuleOptionButton : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
 
     private MotionHandle _motionHandle;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        AudioManager.Instance?.PlayModuleHover();
+    }
 
     public void Setup(ModuleData data, Action onSelect)
     {
@@ -51,6 +57,7 @@ public class ModuleOptionButton : MonoBehaviour
     /// <summary>選択された側の演出：軽くポップ拡大してからフェードアウト</summary>
     public void PlaySelected(Action onComplete)
     {
+        AudioManager.Instance?.PlayModuleSelect();
         button.interactable = false;
         if (_motionHandle.IsActive()) _motionHandle.Cancel();
 

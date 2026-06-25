@@ -18,7 +18,9 @@ public class TutorialFlow : MonoBehaviour
     [SerializeField] private Transform moveTarget1;  // ステップ2：最初の移動先
     [SerializeField] private Transform moveTarget2;  // ステップ3と4の間
     [SerializeField] private Transform moveTarget3;  // ステップ4と5の間
-    [SerializeField] private Transform moveTarget4;  // ステップ6と7の間
+    [SerializeField] private Transform moveTarget4;
+
+    [SerializeField] private Transform moveTarget5;  // ステップ6と7の間
 
     [Header("Enemies")]
     [SerializeField] private TankStatus directShotEnemy; // ステップ3：直接射撃で倒す敵
@@ -32,15 +34,20 @@ public class TutorialFlow : MonoBehaviour
 
     [Header("Module")]
     [SerializeField] private TankModuleManager tankModuleManager;
+    [SerializeField] private ModuleData splitShotModule;      // チュートリアル強制提示
+    [SerializeField] private TankStatus splitShotDemoEnemy;   // SplitShot 体験用の敵
 
     [Tooltip("チュートリアル完了後に非アクティブ化するオブジェクト")]
     [SerializeField] private GameObject[] tutorialOnlyObjects;
+
+    private NotificationEntry _currentTutorialEntry;
 
     void Start()
     {
         if (directShotEnemy != null) directShotEnemy.gameObject.SetActive(false);
         if (bounceEnemy != null) bounceEnemy.gameObject.SetActive(false);
         if (gimmickEnemy != null) gimmickEnemy.gameObject.SetActive(false);
+        if (splitShotDemoEnemy != null) splitShotDemoEnemy.gameObject.SetActive(false);
 
         StartCoroutine(RunTutorial());
     }
@@ -48,7 +55,7 @@ public class TutorialFlow : MonoBehaviour
     private IEnumerator RunTutorial()
     {
         // 1. ようこそ
-        ShowTutorial("ようこそ「Tanker」へ！\n壁反射を活かした弾幕構築ゲームです。");
+        ShowTutorial("ようこそ「Tanker」へ！\n壁反射を活かした戦車ゲームです。");
         yield return new WaitForSecondsRealtime(5f);
 
         // 2. 移動
@@ -62,6 +69,7 @@ public class TutorialFlow : MonoBehaviour
             directShotEnemy.OnDead.Subscribe(_ => dead = true).AddTo(this);
             ShowTutorial("マウスで砲台を向けて、スペースキーで射撃！\n敵を倒そう!");
             yield return new WaitUntil(() => dead);
+            DismissTutorial();
             NotificationManager.Success("敵を撃破！");
             yield return new WaitForSecondsRealtime(1f);
         }
@@ -77,6 +85,7 @@ public class TutorialFlow : MonoBehaviour
             bounceEnemy.OnDead.Subscribe(_ => dead = true).AddTo(this);
             ShowTutorial("壁に向けて撃つと弾が反射する!\n緑の予告線を活用して敵を倒そう!");
             yield return new WaitUntil(() => dead);
+            DismissTutorial();
             NotificationManager.Success("反射で敵を撃破！");
             yield return new WaitForSecondsRealtime(1f);
         }
@@ -90,13 +99,14 @@ public class TutorialFlow : MonoBehaviour
             gimmickEnemy.gameObject.SetActive(true);
             bool dead = false;
             gimmickEnemy.OnDead.Subscribe(_ => dead = true).AddTo(this);
-            ShowTutorial("ボタンに弾を当てるとギミックが作動する！\nうまく利用して敵を倒そう！");
+            ShowTutorial("反射を使うと倒せない敵も倒せる!\n反射を利用して敵を倒そう!");
             yield return new WaitUntil(() => dead);
+            DismissTutorial();
             NotificationManager.Success("ギミックで撃破！");
             yield return new WaitForSecondsRealtime(1f);
         }
 
-        // 6. モジュール説明
+        // 6. モジュール説明 → SplitShot を強制提示
         if (tankModuleManager != null)
         {
             ShowTutorial("レベルアップするとモジュールを選択できる！\n能力をカスタマイズしてタンクを強化しよう。");
@@ -106,21 +116,41 @@ public class TutorialFlow : MonoBehaviour
             tankModuleManager.OnSlotsChanged
                 .Subscribe(_ => moduleSelected = true)
                 .AddTo(this);
+
+            if (splitShotModule != null)
+                tankModuleManager.ForceCandidates(new[] { splitShotModule });
             tankModuleManager.ModuleEarn();
 
             yield return new WaitUntil(() => moduleSelected);
-            NotificationManager.Success("モジュールを装備！");
-            yield return new WaitForSecondsRealtime(0.5f);
+            DismissTutorial();
+            NotificationManager.Success("爆発弾頭を装備！\n弾が壁で跳ねると爆発が起きるぞ！");
+            yield return new WaitForSecondsRealtime(1f);
+        }
+
+        yield return MovePhase(moveTarget4, "さっそく試してみよう!");
+
+        // 6.5. SplitShot 体験：専用の敵を出して効果を試させる
+        if (splitShotDemoEnemy != null)
+        {
+            splitShotDemoEnemy.gameObject.SetActive(true);
+            bool dead = false;
+            splitShotDemoEnemy.OnDead.Subscribe(_ => dead = true).AddTo(this);
+            ShowTutorial("壁に弾を当てると爆発が発生する！\n反射を使って敵を倒してみよう！");
+            yield return new WaitUntil(() => dead);
+            DismissTutorial();
+            NotificationManager.Success("爆発で撃破！");
+            yield return new WaitForSecondsRealtime(1f);
         }
 
         // 6→7 移動
-        yield return MovePhase(moveTarget4, "次のエリアへ進もう！");
+        yield return MovePhase(moveTarget5, "次のエリアへ進もう！");
 
         // 7. ドアギミック
         if (doorSignal != null)
         {
             ShowTutorial("ボタンに弾を当てるとドアが開く！\n反射を使えば奥の目標も狙えるぞ。");
             yield return new WaitUntil(() => doorSignal.IsOn);
+            DismissTutorial();
             NotificationManager.Success("ドアが開いた！");
             yield return new WaitForSecondsRealtime(1f);
         }
@@ -131,6 +161,7 @@ public class TutorialFlow : MonoBehaviour
             ShowTutorial("ゴール地点まで進もう！");
             yield return new WaitUntil(() =>
                 Vector3.Distance(playerTransform.position, goalMarker.position) < targetRadius);
+            DismissTutorial();
         }
 
         // 完了
@@ -156,11 +187,18 @@ public class TutorialFlow : MonoBehaviour
 
     private void ShowTutorial(string msg)
     {
-        NotificationManager.Show(new NotificationData
+        DismissTutorial();
+        _currentTutorialEntry = NotificationManager.ShowEntry(new NotificationData
         {
             Message = msg,
             AccentColor = new Color(0.961f, 0.773f, 0.094f),
             Duration = 30f,
         });
+    }
+
+    private void DismissTutorial()
+    {
+        _currentTutorialEntry?.Dismiss();
+        _currentTutorialEntry = null;
     }
 }

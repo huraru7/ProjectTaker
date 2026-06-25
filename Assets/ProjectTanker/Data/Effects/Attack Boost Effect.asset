@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 424ad31d23a26824e9fbf0a73a9075c7, type: 3}
   m_Name: Attack Boost Effect
   m_EditorClassIdentifier: Assembly-CSharp::AttackBoostEffect
-  attackBonus: 5
+  attackBonus: 1

@@ -49,6 +49,7 @@ public class GetModuleSelectUI : MonoBehaviour
     /// </summary>
     public void ShowOptions(ModuleData[] candidates)
     {
+        AudioManager.Instance?.PlayModuleOpen();
         panel.SetActive(true);
 
         if (panelCanvasGroup != null)

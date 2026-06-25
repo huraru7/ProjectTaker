@@ -29,6 +29,9 @@ public class TankModuleManager : MonoBehaviour
     private bool _isSelectionPending;
     private int  _queuedEarns;
 
+    // 次回の抽選を強制する候補（null なら通常抽選）
+    private ModuleData[] _forcedCandidates;
+
     void Awake()
     {
         _rerollCount = maxRerollCount;
@@ -47,17 +50,31 @@ public class TankModuleManager : MonoBehaviour
         GenerateAndEmitCandidates();
     }
 
+    /// <summary>
+    /// 次回の ModuleEarn() で提示する候補を強制指定する。一度使うとリセットされる。
+    /// </summary>
+    public void ForceCandidates(ModuleData[] candidates) => _forcedCandidates = candidates;
+
     private void GenerateAndEmitCandidates()
     {
         _isSelectionPending = true;
 
-        List<ModuleData> pool = new(moduleLists);
-        ModuleData[] candidates = new ModuleData[Mathf.Min(3, pool.Count)];
-        for (int i = 0; i < candidates.Length; i++)
+        ModuleData[] candidates;
+        if (_forcedCandidates != null)
         {
-            int idx = Random.Range(0, pool.Count);
-            candidates[i] = pool[idx];
-            pool.RemoveAt(idx);
+            candidates = _forcedCandidates;
+            _forcedCandidates = null;
+        }
+        else
+        {
+            List<ModuleData> pool = new(moduleLists);
+            candidates = new ModuleData[Mathf.Min(3, pool.Count)];
+            for (int i = 0; i < candidates.Length; i++)
+            {
+                int idx = Random.Range(0, pool.Count);
+                candidates[i] = pool[idx];
+                pool.RemoveAt(idx);
+            }
         }
         _onModuleCandidatesGenerated.OnNext(candidates);
         _onRerollCountChanged.OnNext(_rerollCount);

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Split Shot Effect
   m_EditorClassIdentifier: Assembly-CSharp::SplitShotEffect
   explosionPrefab: {fileID: 2268259140043241882, guid: c69d6885647d69249861fdf1a1a1d66e, type: 3}
-  baseRadius: 2
-  baseDamage: 5
+  baseRadius: 1
+  baseDamage: 2

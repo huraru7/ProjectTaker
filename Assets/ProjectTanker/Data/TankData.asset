@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f8dfabd60723904bb2550c964d0b07a, type: 3}
   m_Name: TankData
   m_EditorClassIdentifier: Assembly-CSharp::TankData
-  maxHP: 8
+  maxHP: 14
   baseAttackPower: 1
-  movementSpeed: 5
-  turnRate: 6
-  bulletSpeed: 6
+  movementSpeed: 3
+  turnRate: 4
+  bulletSpeed: 4
   magazineCapacity: 5
-  reloadTime: 5
+  reloadTime: 3
   barrelTurnRate: 120
   cameraViewSize: 6
