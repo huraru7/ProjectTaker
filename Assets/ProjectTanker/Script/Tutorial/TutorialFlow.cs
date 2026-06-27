@@ -9,6 +9,9 @@ using UnityEngine;
 /// </summary>
 public class TutorialFlow : MonoBehaviour
 {
+    [Header("Game")]
+    [SerializeField] private GameManager _gameManager;
+
     [Header("Player")]
     [SerializeField] private TankStatus playerStatus;
     [SerializeField] private TankBulletManager playerBulletManager;
@@ -165,13 +168,7 @@ public class TutorialFlow : MonoBehaviour
         }
 
         // 完了
-        NotificationManager.Success("チュートリアル完了!ステージ1へ進め!");
-        yield return new WaitForSecondsRealtime(1.5f);
-
-        foreach (var obj in tutorialOnlyObjects)
-            if (obj != null) obj.SetActive(false);
-
-        gameObject.SetActive(false);
+        _gameManager?.TriggerClear();
     }
 
     private IEnumerator MovePhase(Transform target, string message)
