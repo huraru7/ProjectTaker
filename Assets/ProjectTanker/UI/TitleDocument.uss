@@ -1,0 +1,115 @@
+.root {
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+/* ─── グリッド背景（全面） ─── */
+.grid-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* ─── 左パネル（半透明白） ─── */
+.left-panel {
+    width: 42%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 80px 72px;
+    background-color: rgba(255, 255, 255, 0.52);
+}
+
+/* ─── ロゴ ─── */
+.logo-area {
+    flex-direction: row;
+    align-items: center;
+}
+
+.logo-icon {
+    width: 58px;
+    height: 58px;
+    background-color: rgba(26, 44, 78, 0.88);
+    border-radius: 6px;
+    margin-right: 18px;
+}
+
+.logo-text {
+    font-size: 58px;
+    color: rgba(26, 44, 78, 1);
+    -unity-font-style: bold;
+    letter-spacing: 8px;
+}
+
+/* ─── メニュー ─── */
+.menu-area {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 20px;
+}
+
+.menu-button {
+    background-color: rgba(26, 44, 78, 0);
+    border-width: 2px;
+    border-color: rgba(26, 44, 78, 0.22);
+    color: rgba(26, 44, 78, 0.72);
+    font-size: 42px;
+    -unity-font-style: bold;
+    letter-spacing: 5px;
+    margin-bottom: 16px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 28px;
+    padding-right: 52px;
+    border-radius: 4px;
+    min-width: 260px;
+}
+
+.menu-button:hover {
+    background-color: rgba(26, 44, 78, 0.09);
+    border-color: rgba(26, 44, 78, 0.55);
+    color: rgba(26, 44, 78, 1);
+}
+
+.menu-button:active {
+    background-color: rgba(26, 44, 78, 0.18);
+    color: rgba(26, 44, 78, 1);
+}
+
+.menu-button:focus {
+    background-color: rgba(26, 44, 78, 0);
+}
+
+/* ─── 右パネル（戦車デモ） ─── */
+.right-panel {
+    flex-grow: 1;
+    height: 100%;
+    overflow: hidden;
+}
+
+.tank-scene {
+    width: 100%;
+    height: 100%;
+}
+
+.tank-sprite {
+    position: absolute;
+    width: 88px;
+    height: 88px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.tank-bullet {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    background-color: rgba(255, 210, 60, 1);
+    display: none;
+}

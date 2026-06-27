@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="TitleDocument.uss" />
+    <ui:VisualElement name="root" class="root">
+        <ui:VisualElement name="grid-bg" class="grid-bg" picking-mode="Ignore" />
+        <ui:VisualElement name="left-panel" class="left-panel">
+            <ui:VisualElement name="logo-area" class="logo-area">
+                <ui:VisualElement name="logo-icon" class="logo-icon" picking-mode="Ignore" />
+                <ui:Label name="logo-text" class="logo-text" text="TANKER" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="menu-area" class="menu-area">
+                <ui:Button name="start-button"  class="menu-button" text="START"  />
+                <ui:Button name="credit-button" class="menu-button" text="CREDIT" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="right-panel" class="right-panel" picking-mode="Ignore">
+            <ui:VisualElement name="tank-scene" class="tank-scene" picking-mode="Ignore">
+                <ui:VisualElement name="tank-player"        class="tank-sprite" picking-mode="Ignore" />
+                <ui:VisualElement name="tank-turret-player" class="tank-sprite" picking-mode="Ignore" />
+                <ui:VisualElement name="tank-enemy"         class="tank-sprite" picking-mode="Ignore" />
+                <ui:VisualElement name="tank-turret-enemy"  class="tank-sprite" picking-mode="Ignore" />
+                <ui:VisualElement name="tank-bullet"        class="tank-bullet" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
