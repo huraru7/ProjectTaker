@@ -88,3 +88,48 @@ RerollRow
 | 弾の継続 | そのまま反射を続ける（毎反射で爆発が発生） |
 | スタック 2 | 範囲が +0.5 拡大、ダメージが 2 倍 |
 | カメラシェイク | 爆発のたびに軽くシェイクする |
+
+---
+
+## タイトル画面セットアップ（UI Toolkit）
+
+スクリプト・UXML・USSはすべて実装済み。以下の手順のみが必要。
+
+### ① Panel Settings の作成
+
+Project ウィンドウで右クリック →  
+**Create > UI Toolkit > Panel Settings Asset**  
+→ `Assets/ProjectTanker/UI/TitlePanelSettings.asset` として保存
+
+| プロパティ | 値 |
+|---|---|
+| Scale Mode | Scale With Screen Size |
+| Reference Resolution | 1920 × 1080 |
+| Match | 0.5（Width と Height の中間） |
+
+### ② UXML に USS をリンク
+
+Project ウィンドウで `Assets/ProjectTanker/UI/TitleDocument.uxml` をダブルクリック → UI Builder が開く → **StyleSheets パネル**（左上）で `+` → `TitleDocument.uss` を追加して保存。
+
+### ③ シーンへの配置（`0_title.unity` を開いた状態で）
+
+1. Hierarchy で空の GameObject を作成 → 名前を `TitleUI` にする
+2. `UIDocument` コンポーネントを追加
+   - **Panel Settings** → 上記で作成した `TitlePanelSettings` をセット
+   - **Source Asset** → `Assets/ProjectTanker/UI/TitleDocument.uxml` をセット
+3. `TitleUI` スクリプトを同じ GameObject にアタッチ
+4. `TitleUI` コンポーネントのフィールドに以下をセット：
+   - **Tank Body Sprite** → `Assets/ProjectTanker/Art/Image/tank/tank_body.png`
+   - **Tank Turret Sprite** → `Assets/ProjectTanker/Art/Image/tank/tank_turret.png`
+   - **Bullet Sprite** → `Assets/ProjectTanker/Art/Image/tank_bullet.png`（任意・未設定でも黄色の円で代替）
+
+### ④ 動作確認
+
+| 確認項目 | 期待挙動 |
+|---|---|
+| 再生直後 | 明るいブルーグレー背景 + 動くグリッド線 |
+| 左パネル | 半透明白パネル内にロゴとボタンが表示 |
+| 右パネル | プレイヤー戦車（固定）と敵戦車（左右パトロール）が表示 |
+| 数秒後 | 弾が発射されて壁で反射、敵に命中、ヒット演出 |
+| ホバー | ボタンが右にスライド |
+| START クリック | `1_MainGame` シーンへ遷移 |
