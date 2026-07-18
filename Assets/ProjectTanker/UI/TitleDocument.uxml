@@ -5,7 +5,7 @@
         <ui:VisualElement name="left-panel" class="left-panel">
             <ui:VisualElement name="logo-area" class="logo-area">
                 <ui:VisualElement name="logo-icon" class="logo-icon" picking-mode="Ignore" />
-                <ui:Label name="logo-text" class="logo-text" text="TANKER" picking-mode="Ignore" />
+                <ui:Label name="logo-text" class="logo-text" text="RICOCORE" picking-mode="Ignore" />
             </ui:VisualElement>
             <ui:VisualElement name="menu-area" class="menu-area">
                 <ui:Button name="start-button"  class="menu-button" text="START"  />
