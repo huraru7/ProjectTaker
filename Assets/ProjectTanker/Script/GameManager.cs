@@ -3,12 +3,19 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     [SerializeField] private TankStatus      _playerStatus;
     [SerializeField] private GameResultUI    _resultUI;
     [SerializeField] private StageClearUI    _clearUI;
     [SerializeField] private StageStatTracker _statTracker;
 
     private bool _ended;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -18,6 +25,16 @@ public class GameManager : MonoBehaviour
     }
 
     public void TriggerClear() => EndGame(true);
+
+    /// <summary>
+    /// 次のステージへ進む際に呼び出し、クリア/ゲームオーバー判定を再度受け付けられる状態に戻す。
+    /// </summary>
+    public void ResetForNextStage()
+    {
+        _ended = false;
+        Time.timeScale = 1f;
+        _statTracker?.ResetAndStart();
+    }
 
     private void EndGame(bool isWin)
     {

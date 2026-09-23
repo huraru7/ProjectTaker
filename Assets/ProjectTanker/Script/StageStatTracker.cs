@@ -41,5 +41,19 @@ public class StageStatTracker : MonoBehaviour
         _bulletManager.OnBulletFired -= OnBulletFired;
     }
 
+    /// <summary>
+    /// 次のステージ開始時に計測をリセットして再開する。
+    /// </summary>
+    public void ResetAndStart()
+    {
+        ShotCount      = 0;
+        TraveledMeters = 0f;
+        ElapsedSeconds = 0f;
+        _startTime     = Time.time;
+        _prevPosition  = _playerTransform.position;
+        _tracking      = true;
+        _bulletManager.OnBulletFired += OnBulletFired;
+    }
+
     private void OnBulletFired(Bullet _) => ShotCount++;
 }

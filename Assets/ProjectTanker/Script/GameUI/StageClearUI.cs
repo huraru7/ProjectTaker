@@ -19,6 +19,9 @@ public class StageClearUI : MonoBehaviour
     [Header("ボタン")]
     [SerializeField] private CanvasGroup _buttonGroup;
 
+    [Header("ステージ遷移")]
+    [SerializeField] private StageManager _stageManager;
+
     void Awake()
     {
         if (_panel != null) _panel.SetActive(false);
@@ -136,5 +139,11 @@ public class StageClearUI : MonoBehaviour
             .AddTo(this);
     }
 
-    public void OnNextStage() { }
+    public void OnNextStage()
+    {
+        if (_panel != null) _panel.SetActive(false);
+        gameObject.SetActive(false);
+
+        _stageManager?.AdvanceToNextStage();
+    }
 }
