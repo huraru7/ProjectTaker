@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f8dfabd60723904bb2550c964d0b07a, type: 3}
+  m_Name: EnemyTankData 1
+  m_EditorClassIdentifier: Assembly-CSharp::TankData
+  maxHP: 4
+  baseAttackPower: 1
+  movementSpeed: 3
+  turnRate: 3
+  bulletSpeed: 2
+  magazineCapacity: 5
+  reloadTime: 3
+  barrelTurnRate: 120
+  cameraViewSize: 5
