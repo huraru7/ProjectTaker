@@ -57,6 +57,7 @@ public class GetModuleSelectUI : MonoBehaviour
             if (_panelFadeHandle.IsActive()) _panelFadeHandle.Cancel();
             panelCanvasGroup.alpha = 0f;
             _panelFadeHandle = LMotion.Create(0f, 1f, 0.2f)
+                .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
                 .Bind(a => panelCanvasGroup.alpha = a)
                 .AddTo(this);
         }

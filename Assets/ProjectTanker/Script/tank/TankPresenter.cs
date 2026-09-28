@@ -16,9 +16,13 @@ public class TankPresenter : MonoBehaviour
 
     void Start()
     {
-        // Model→View: 3択候補が生成されたらUIに表示
+        // Model→View: 3択候補が生成されたらUIに表示（選択が終わるまでゲームを一時停止）
         tankModuleManager.OnModuleCandidatesGenerated
-            .Subscribe(candidates => getModuleSelectUI.ShowOptions(candidates))
+            .Subscribe(candidates =>
+            {
+                Time.timeScale = 0f;
+                getModuleSelectUI.ShowOptions(candidates);
+            })
             .AddTo(this);
 
         // View→Model: 選択されたモジュールを空きスロットへ自動装備、満杯なら入れ替えUIへ
@@ -28,6 +32,7 @@ public class TankPresenter : MonoBehaviour
                 if (tankModuleManager.TryAutoEquip(selected))
                 {
                     _pendingModule = null;
+                    Time.timeScale = 1f;
                     tankModuleManager.NotifySelectionResolved();
                 }
                 else
@@ -45,6 +50,7 @@ public class TankPresenter : MonoBehaviour
                 if (slotIndex >= 0 && _pendingModule != null)
                     tankModuleManager.SetModule(slotIndex, _pendingModule);
                 _pendingModule = null;
+                Time.timeScale = 1f;
                 tankModuleManager.NotifySelectionResolved();
             })
             .AddTo(this);

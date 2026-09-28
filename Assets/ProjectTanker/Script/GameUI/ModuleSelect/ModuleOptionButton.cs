@@ -46,6 +46,7 @@ public class ModuleOptionButton : MonoBehaviour, IPointerEnterHandler
         _motionHandle = LMotion.Create(0f, 1f, 0.35f)
             .WithDelay(delay)
             .WithEase(Ease.OutBack)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
             .Bind(t =>
             {
                 transform.localScale = Vector3.one * Mathf.Lerp(0.6f, 1f, t);
@@ -64,6 +65,7 @@ public class ModuleOptionButton : MonoBehaviour, IPointerEnterHandler
         _motionHandle = LMotion.Create(0f, 1f, 0.32f)
             .WithEase(Ease.OutCubic)
             .WithOnComplete(() => onComplete?.Invoke())
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
             .Bind(t =>
             {
                 float scale = t < 0.5f
@@ -84,6 +86,7 @@ public class ModuleOptionButton : MonoBehaviour, IPointerEnterHandler
 
         _motionHandle = LMotion.Create(0f, 1f, 0.2f)
             .WithEase(Ease.InQuad)
+            .WithScheduler(MotionScheduler.UpdateIgnoreTimeScale)
             .Bind(t =>
             {
                 transform.localScale = Vector3.one * Mathf.Lerp(1f, 0.85f, t);
