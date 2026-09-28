@@ -30,8 +30,10 @@ public class SplitShotController : MonoBehaviour
     private void HandleBulletFired(Bullet bullet)
     {
         var existing = bullet.GetComponent<SplitShotBehavior>();
-        if (existing != null) Destroy(existing);
-        bullet.gameObject.AddComponent<SplitShotBehavior>()
-            .Initialize(_explosionPrefab, _radius, _damage, _owner);
+        if (existing != null)
+            existing.Initialize(_explosionPrefab, _radius, _damage, _owner);
+        else
+            bullet.gameObject.AddComponent<SplitShotBehavior>()
+                .Initialize(_explosionPrefab, _radius, _damage, _owner);
     }
 }

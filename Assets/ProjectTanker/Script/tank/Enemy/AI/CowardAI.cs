@@ -22,12 +22,19 @@ using UnityEngine;
 [Serializable]
 public class CowardAI : EnemyAIBase
 {
+    [Tooltip("探知範囲")]
     [SerializeField] private float detectionRange = 16f;
+    [Tooltip("これ以上離れていれば安全と判断する距離")]
     [SerializeField] private float safeDistance = 10f;
+    [Tooltip("これより近いと全力で逃げる距離")]
     [SerializeField] private float panicDistance = 7f;
+    [Tooltip("安全時の射撃間隔（秒）")]
     [SerializeField] private float fireInterval = 1.0f;
+    [Tooltip("直接射撃の角度許容範囲（度）")]
     [SerializeField] private float fireAngleThreshold = 20f;
+    [Tooltip("壁反射時の角度許容範囲（度）")]
     [SerializeField] private float bounceAngleTolerance = 15f;
+    [Tooltip("難易度 1〜5（3 がベースライン）")]
     [SerializeField] private int difficulty = 3;
 
     private float _fireTimer;
@@ -57,6 +64,12 @@ public class CowardAI : EnemyAIBase
         float distance   = toPlayer.magnitude;
 
         if (distance > _effectiveDetectionRange)
+        {
+            manager.Move(Vector2.zero);
+            return;
+        }
+
+        if (distance < 0.01f)
         {
             manager.Move(Vector2.zero);
             return;

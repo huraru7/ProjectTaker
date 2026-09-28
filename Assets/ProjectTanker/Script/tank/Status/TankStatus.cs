@@ -21,6 +21,8 @@ public class TankStatus : MonoBehaviour
     private Subject<Unit> _onDead = new();
     public Observable<Unit> OnDead => _onDead;
 
+    private bool _isDead;
+
     public SerializableReactiveProperty<int> getHP => HP;
     public SerializableReactiveProperty<int> getMaxHP => maxHP;
     public SerializableReactiveProperty<int> getBaseAttackPower => baseAttackPower;
@@ -57,6 +59,7 @@ public class TankStatus : MonoBehaviour
     /// </summary>
     public void ResetStatus()
     {
+        _isDead = false;
         HP.Value = data.maxHP;
         maxHP.Value = data.maxHP;
         baseAttackPower.Value = data.baseAttackPower;
@@ -83,12 +86,17 @@ public class TankStatus : MonoBehaviour
         reloadTime.Value = data.reloadTime;
         barrelTurnRate.Value = data.barrelTurnRate;
         cameraViewSize.Value = data.cameraViewSize;
+        HP.Value = Mathf.Min(HP.Value, maxHP.Value);
     }
 
     public void DealDamage(int amount)
     {
-        if (amount <= 0) return;
+        if (amount <= 0 || _isDead) return;
         HP.Value = Mathf.Clamp(HP.Value - amount, 0, maxHP.Value);
-        if (HP.Value == 0) _onDead.OnNext(Unit.Default);
+        if (HP.Value == 0)
+        {
+            _isDead = true;
+            _onDead.OnNext(Unit.Default);
+        }
     }
 }

@@ -24,23 +24,35 @@ using UnityEngine;
 [Serializable]
 public class ExpertAI : EnemyAIBase
 {
+    [Tooltip("探知範囲")]
     [SerializeField] private float detectionRange = 14f;
+    [Tooltip("維持したい戦闘距離")]
     [SerializeField] private float preferredDistance = 6f;
+    [Tooltip("距離帯の誤差許容")]
     [SerializeField] private float margin = 1.5f;
+    [Tooltip("弾の予測リードタイム（秒）。プレイヤーの移動速度から着弾先を予測する")]
     [SerializeField] private float predictionTime = 0.4f;
+    [Tooltip("直接射撃の角度許容範囲（度）")]
     [SerializeField] private float fireAngleThreshold = 12f;
+    [Tooltip("反射射撃の角度許容範囲（度）")]
     [SerializeField] private float bounceAngleTolerance = 10f;
+    [Tooltip("反射方向の再計算間隔（秒）")]
     [SerializeField] private float bounceCheckInterval = 0.5f;
+    [Tooltip("直接射撃・反射射撃の連射間隔（秒）")]
+    [SerializeField] private float fireInterval = 0.25f;
+    [Tooltip("難易度 1〜5（3 がベースライン）")]
     [SerializeField] private int difficulty = 3;
 
     private Rigidbody2D _playerRb;
     private Vector2 _bounceCacheDir;
     private float _bounceCacheTimer;
     private float _bounceCheckTimer;
+    private float _fireTimer;
 
     private float _effectiveFireAngle;
     private float _effectivePredictionTime;
     private float _effectiveDetectionRange;
+    private float _effectiveFireInterval;
     private bool _useBounceShots;
 
     public override int GetDifficulty() => difficulty;
@@ -56,7 +68,9 @@ public class ExpertAI : EnemyAIBase
         _effectiveFireAngle      = fireAngleThreshold * AIUtil.AngleScale[d];
         _effectivePredictionTime = predictionTime * AIUtil.RangeScale[d];  // 難易度高いほど予測が正確
         _effectiveDetectionRange = detectionRange * AIUtil.RangeScale[d];
+        _effectiveFireInterval   = fireInterval * AIUtil.TimerScale[d];
         _useBounceShots          = AIUtil.UsesBounceShots(difficulty);
+        _fireTimer               = _effectiveFireInterval;
     }
 
     public override void UpdateAI(EnemyManager manager)
@@ -77,6 +91,14 @@ public class ExpertAI : EnemyAIBase
             return;
         }
 
+        _fireTimer -= Time.deltaTime;
+
+        if (distance < 0.01f)
+        {
+            manager.Move(Vector2.zero);
+            return;
+        }
+
         Vector2 dir = toPlayer / distance;
 
         // 3段階距離管理（壁回避つき）
@@ -92,13 +114,15 @@ public class ExpertAI : EnemyAIBase
             ? playerPos + _playerRb.linearVelocity * _effectivePredictionTime
             : playerPos;
         Vector2 toPredicted = predictedPos - selfPos;
+        if (toPredicted.sqrMagnitude < 0.0001f) toPredicted = toPlayer;
 
         manager.AimBarrel(toPredicted.normalized);
 
-        // 直接射撃チェック（毎フレーム・軽量）
-        if (Vector2.Angle(manager.BarrelAimDirection, toPredicted) <= _effectiveFireAngle)
+        // 直接射撃チェック（連射防止のインターバルつき・毎フレーム軽量判定）
+        if (_fireTimer <= 0f && Vector2.Angle(manager.BarrelAimDirection, toPredicted) <= _effectiveFireAngle)
         {
             manager.Fire();
+            _fireTimer = _effectiveFireInterval;
             return;
         }
 
@@ -115,8 +139,11 @@ public class ExpertAI : EnemyAIBase
             }
         }
 
-        // キャッシュした壁反射方向で射撃
-        if (_bounceCacheTimer > 0f)
+        // キャッシュした壁反射方向で射撃（連射防止のインターバルつき）
+        if (_fireTimer <= 0f && _bounceCacheTimer > 0f)
+        {
             manager.FireInDirection(_bounceCacheDir);
+            _fireTimer = _effectiveFireInterval;
+        }
     }
 }

@@ -9,6 +9,7 @@ public class ExpOrb : MonoBehaviour
     private int         _xpValue;
     private Transform   _player;
     private Rigidbody2D _rb;
+    private bool        _collected;
 
     void Awake()
     {
@@ -21,6 +22,7 @@ public class ExpOrb : MonoBehaviour
         _xpValue           = xpValue;
         _player            = player;
         _rb.linearVelocity = initialVelocity;
+        _collected         = false;
     }
 
     void FixedUpdate()
@@ -37,8 +39,10 @@ public class ExpOrb : MonoBehaviour
     // IsTrigger=true の CircleCollider2D がプレイヤーに重なったとき呼ばれる
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (_collected) return;
         // GetComponentInParent でコライダーが子オブジェクトにある場合も検出する
         if (other.GetComponentInParent<TankMovement>() == null) return;
+        _collected = true;
         ExperienceManager.Instance.CollectXp(_xpValue);
         ExperienceManager.Instance.ReturnOrb(this);
     }

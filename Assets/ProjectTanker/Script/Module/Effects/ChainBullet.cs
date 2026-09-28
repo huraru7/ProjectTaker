@@ -53,7 +53,7 @@ public class ChainBullet : MonoBehaviour
         foreach (var h in hits)
         {
             var s = h.GetComponentInParent<TankStatus>();
-            if (s == null || s == _owner || s == _target) continue;
+            if (s == null || s == _owner || s == _target || s.getHP.Value <= 0) continue;
             float d = Vector2.Distance(pos, s.transform.position);
             if (d < minDist) { minDist = d; next = s; }
         }

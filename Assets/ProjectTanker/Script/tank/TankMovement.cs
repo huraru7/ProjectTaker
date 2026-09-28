@@ -44,9 +44,9 @@ public class TankMovement : MonoBehaviour
 
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
         Vector3 mouseWorld  = Camera.main.ScreenToWorldPoint(new Vector3(mouseScreen.x, mouseScreen.y, 0f));
-        Vector2 dir = ((Vector2)mouseWorld - (Vector2)transform.position).normalized;
-        if (dir != Vector2.zero)
-            _barrel.RotateTo(dir);
+        Vector2 toMouse     = (Vector2)mouseWorld - (Vector2)transform.position;
+        if (toMouse.sqrMagnitude > 0.0001f)
+            _barrel.RotateTo(toMouse.normalized);
     }
 
     private void FixedUpdate()

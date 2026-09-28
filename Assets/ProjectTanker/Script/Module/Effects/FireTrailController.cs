@@ -32,8 +32,10 @@ public class FireTrailController : MonoBehaviour
     private void HandleBulletFired(Bullet bullet)
     {
         var existing = bullet.GetComponent<FireTrailBehavior>();
-        if (existing != null) Destroy(existing);
-        bullet.gameObject.AddComponent<FireTrailBehavior>()
-            .Initialize(_prefab, _interval, _duration, _damage, _owner);
+        if (existing != null)
+            existing.Initialize(_prefab, _interval, _duration, _damage, _owner);
+        else
+            bullet.gameObject.AddComponent<FireTrailBehavior>()
+                .Initialize(_prefab, _interval, _duration, _damage, _owner);
     }
 }

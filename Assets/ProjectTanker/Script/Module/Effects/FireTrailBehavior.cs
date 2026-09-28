@@ -7,6 +7,7 @@ public class FireTrailBehavior : MonoBehaviour
 
     public void Initialize(GameObject prefab, float interval, float duration, int damage, TankStatus owner)
     {
+        StopAllCoroutines(); // 再初期化時に古いループが残らないようにする
         _active = true;
         StartCoroutine(SpawnCo(prefab, interval, duration, damage, owner));
     }

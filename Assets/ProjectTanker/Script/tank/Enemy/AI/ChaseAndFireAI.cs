@@ -20,15 +20,24 @@ using UnityEngine;
 [Serializable]
 public class ChaseAndFireAI : EnemyAIBase
 {
+    [Tooltip("追跡を開始する距離")]
     [SerializeField] private float detectionRange = 10f;
+    [Tooltip("維持したい戦闘距離")]
     [SerializeField] private float preferredDistance = 5f;
+    [Tooltip("距離帯の誤差許容")]
     [SerializeField] private float margin = 1f;
+    [Tooltip("射撃を行う角度許容範囲（度）")]
     [SerializeField] private float fireAngleThreshold = 15f;
+    [Tooltip("直接射撃の連射間隔（秒）")]
+    [SerializeField] private float fireInterval = 0.3f;
+    [Tooltip("難易度 1〜5（3 がベースライン）")]
     [SerializeField] private int difficulty = 3;
 
     private float _effectiveFireAngle;
+    private float _effectiveFireInterval;
     private float _effectiveDetectionRange;
     private bool _useBounceShots;
+    private float _fireTimer;
 
     public override int GetDifficulty() => difficulty;
 
@@ -36,8 +45,10 @@ public class ChaseAndFireAI : EnemyAIBase
     {
         int d = Mathf.Clamp(difficulty, 1, 5) - 1;
         _effectiveFireAngle      = fireAngleThreshold * AIUtil.AngleScale[d];
+        _effectiveFireInterval   = fireInterval * AIUtil.TimerScale[d];
         _effectiveDetectionRange = detectionRange * AIUtil.RangeScale[d];
         _useBounceShots          = AIUtil.UsesBounceShots(difficulty);
+        _fireTimer               = _effectiveFireInterval;
     }
 
     public override void UpdateAI(EnemyManager manager)
@@ -49,6 +60,14 @@ public class ChaseAndFireAI : EnemyAIBase
         float distance   = toPlayer.magnitude;
 
         if (distance > _effectiveDetectionRange)
+        {
+            manager.Move(Vector2.zero);
+            return;
+        }
+
+        _fireTimer -= Time.deltaTime;
+
+        if (distance < 0.01f)
         {
             manager.Move(Vector2.zero);
             return;
@@ -67,10 +86,11 @@ public class ChaseAndFireAI : EnemyAIBase
         // バレルをプレイヤー方向へ向ける
         manager.AimBarrel(dir);
 
-        // 直接射撃
-        if (Vector2.Angle(manager.BarrelAimDirection, toPlayer) <= _effectiveFireAngle)
+        // 直接射撃（連射防止のインターバルつき）
+        if (_fireTimer <= 0f && Vector2.Angle(manager.BarrelAimDirection, toPlayer) <= _effectiveFireAngle)
         {
             manager.Fire();
+            _fireTimer = _effectiveFireInterval;
             return;
         }
 

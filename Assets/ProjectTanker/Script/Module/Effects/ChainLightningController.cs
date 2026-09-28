@@ -32,8 +32,10 @@ public class ChainLightningController : MonoBehaviour
     private void HandleBulletFired(Bullet bullet)
     {
         var existing = bullet.GetComponent<ChainLightningBehavior>();
-        if (existing != null) Destroy(existing);
-        bullet.gameObject.AddComponent<ChainLightningBehavior>()
-            .Initialize(_chainBulletPrefab, _damage, _chainCount, _chainRadius, _owner);
+        if (existing != null)
+            existing.Initialize(_chainBulletPrefab, _damage, _chainCount, _chainRadius, _owner);
+        else
+            bullet.gameObject.AddComponent<ChainLightningBehavior>()
+                .Initialize(_chainBulletPrefab, _damage, _chainCount, _chainRadius, _owner);
     }
 }

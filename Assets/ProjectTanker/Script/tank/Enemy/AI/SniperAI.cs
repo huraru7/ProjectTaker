@@ -23,12 +23,19 @@ using UnityEngine;
 [Serializable]
 public class SniperAI : EnemyAIBase
 {
+    [Tooltip("広い探知範囲")]
     [SerializeField] private float detectionRange = 20f;
+    [Tooltip("停止して狙い始める距離")]
     [SerializeField] private float snipeRange = 13f;
+    [Tooltip("後退を開始する距離")]
     [SerializeField] private float retreatRange = 6f;
+    [Tooltip("精密射撃の角度許容範囲（度）")]
     [SerializeField] private float fireAngleThreshold = 5f;
+    [Tooltip("壁反射時の角度許容範囲（度）")]
     [SerializeField] private float bounceAngleTolerance = 8f;
+    [Tooltip("射撃前のエイム時間（秒）")]
     [SerializeField] private float aimDuration = 1.2f;
+    [Tooltip("難易度 1〜5（3 がベースライン）")]
     [SerializeField] private int difficulty = 3;
 
     private float _aimTimer;
@@ -58,6 +65,13 @@ public class SniperAI : EnemyAIBase
         float distance   = toPlayer.magnitude;
 
         if (distance > _effectiveDetectionRange)
+        {
+            manager.Move(Vector2.zero);
+            _aimTimer = 0f;
+            return;
+        }
+
+        if (distance < 0.01f)
         {
             manager.Move(Vector2.zero);
             _aimTimer = 0f;

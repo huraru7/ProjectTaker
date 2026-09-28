@@ -7,13 +7,17 @@ public class SplitShotBehavior : MonoBehaviour
     private int        _damage;
     private TankStatus _owner;
 
+    private Bullet _bullet;
+
     public void Initialize(GameObject explosionPrefab, float radius, int damage, TankStatus owner)
     {
+        if (_bullet != null) _bullet.OnWallBounce -= OnWallBounce; // 再初期化時の二重購読を防ぐ
         _explosionPrefab = explosionPrefab;
         _radius  = radius;
         _damage  = damage;
         _owner   = owner;
-        GetComponent<Bullet>().OnWallBounce += OnWallBounce;
+        _bullet  = GetComponent<Bullet>();
+        _bullet.OnWallBounce += OnWallBounce;
     }
 
     void OnDisable()

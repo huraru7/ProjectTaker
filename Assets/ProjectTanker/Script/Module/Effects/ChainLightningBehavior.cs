@@ -9,16 +9,20 @@ public class ChainLightningBehavior : MonoBehaviour
     private TankStatus _owner;
     private bool       _active;
 
+    private Bullet _bullet;
+
     public void Initialize(GameObject chainBulletPrefab, int damage,
                            int chainCount, float chainRadius, TankStatus owner)
     {
+        if (_bullet != null) _bullet.OnImpact -= OnImpact; // 再初期化時の二重購読を防ぐ
         _chainBulletPrefab = chainBulletPrefab;
         _damage      = damage;
         _chainCount  = chainCount;
         _chainRadius = chainRadius;
         _owner       = owner;
         _active      = true;
-        GetComponent<Bullet>().OnImpact += OnImpact;
+        _bullet      = GetComponent<Bullet>();
+        _bullet.OnImpact += OnImpact;
     }
 
     void OnDisable()
@@ -40,7 +44,7 @@ public class ChainLightningBehavior : MonoBehaviour
         foreach (var h in hits)
         {
             var s = h.GetComponentInParent<TankStatus>();
-            if (s == null || s == _owner || s == target) continue;
+            if (s == null || s == _owner || s == target || s.getHP.Value <= 0) continue;
             float d = Vector2.Distance(pos, s.transform.position);
             if (d < minDist) { minDist = d; next = s; }
         }
