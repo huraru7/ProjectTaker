@@ -22,6 +22,6 @@ public class GameResultUI : MonoBehaviour
     public void OnTitle()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("2_title");
+        SceneManager.LoadScene("0_title");
     }
 }
