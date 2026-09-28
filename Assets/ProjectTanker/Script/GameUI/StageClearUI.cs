@@ -3,6 +3,7 @@ using LitMotion;
 using LitMotion.Extensions;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StageClearUI : MonoBehaviour
 {
@@ -18,13 +19,24 @@ public class StageClearUI : MonoBehaviour
 
     [Header("ボタン")]
     [SerializeField] private CanvasGroup _buttonGroup;
+    [SerializeField] private TextMeshProUGUI _nextStageButtonLabel;
 
     [Header("ステージ遷移")]
     [SerializeField] private StageManager _stageManager;
 
+    [Header("全ステージクリア時の文言")]
+    [SerializeField] private string _allClearTitle = "ALL CLEAR";
+    [SerializeField] private string _backToTitleLabel = "タイトルへ戻る";
+
+    private string _defaultTitleText;
+    private string _defaultButtonLabel;
+
     void Awake()
     {
         if (_panel != null) _panel.SetActive(false);
+
+        if (_titleText != null) _defaultTitleText = _titleText.text;
+        if (_nextStageButtonLabel != null) _defaultButtonLabel = _nextStageButtonLabel.text;
     }
 
     public void Show(int shots, float seconds, float distance)
@@ -34,6 +46,15 @@ public class StageClearUI : MonoBehaviour
             Debug.LogWarning("[StageClearUI] _panel が未設定です。インスペクタで紐付けてください。");
             return;
         }
+        if (_stageManager == null)
+            Debug.LogWarning("[StageClearUI] _stageManager が未設定です。インスペクタで紐付けてください。");
+
+        bool isFinalStage = _stageManager != null && !_stageManager.HasNextStage;
+        if (_titleText != null)
+            _titleText.text = isFinalStage ? _allClearTitle : _defaultTitleText;
+        if (_nextStageButtonLabel != null)
+            _nextStageButtonLabel.text = isFinalStage ? _backToTitleLabel : _defaultButtonLabel;
+
         gameObject.SetActive(true);
         _panel.SetActive(true);
         StartCoroutine(PlayAnimation(shots, seconds, distance));
@@ -144,6 +165,14 @@ public class StageClearUI : MonoBehaviour
         if (_panel != null) _panel.SetActive(false);
         gameObject.SetActive(false);
 
-        _stageManager?.AdvanceToNextStage();
+        if (_stageManager != null && _stageManager.HasNextStage)
+        {
+            _stageManager.AdvanceToNextStage();
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            SceneManager.LoadScene("0_title");
+        }
     }
 }
