@@ -7,12 +7,47 @@ using UnityEngine;
 /// </summary>
 public class StageManager : MonoBehaviour
 {
-    [SerializeField] private Transform   _playerTransform;
+    [SerializeField] private Transform    _playerTransform;
     [SerializeField] private GameObject[] _stages;
 
+    [Tooltip("チュートリアル進行を持つオブジェクト。_stages[0](tutorials)以外がアクティブな状態で開始された場合に無効化する")]
+    [SerializeField] private GameObject _tutorialRoot;
+
     private int _currentIndex;
+    private bool _needsInitialEntry;
 
     public bool HasNextStage => _currentIndex + 1 < _stages.Length;
+
+    void Awake()
+    {
+        _currentIndex = FindActiveStageIndex();
+
+        // Editor上でtutorials以外のステージがアクティブなまま再生された場合、
+        // 動作確認用にチュートリアルをスキップしてそのステージから直接開始する。
+        // チュートリアルの無効化はAwake()フェーズ中(Start()が呼ばれる前)に
+        // 行う必要があるためここで行うが、GameManager.Instanceの初期化順は
+        // 保証されないため、それに依存する処理はStart()側で行う。
+        if (_currentIndex > 0)
+        {
+            if (_tutorialRoot != null) _tutorialRoot.SetActive(false);
+            _needsInitialEntry = true;
+        }
+    }
+
+    void Start()
+    {
+        if (!_needsInitialEntry) return;
+
+        EnterStage(_stages[_currentIndex]);
+        GameManager.Instance?.ResetForNextStage();
+    }
+
+    private int FindActiveStageIndex()
+    {
+        for (int i = 0; i < _stages.Length; i++)
+            if (_stages[i] != null && _stages[i].activeSelf) return i;
+        return 0;
+    }
 
     public void AdvanceToNextStage()
     {
@@ -22,15 +57,27 @@ public class StageManager : MonoBehaviour
         _currentIndex++;
         var nextStage = _stages[_currentIndex];
 
-        if (currentStage != null) currentStage.SetActive(false);
-        nextStage.SetActive(true);
+        if (nextStage == null)
+        {
+            Debug.LogWarning($"[StageManager] _stages[{_currentIndex}] が未設定です。インスペクタで紐付けてください。");
+            _currentIndex--;
+            return;
+        }
 
-        var startPoint = nextStage.transform.Find("StartPoint");
+        if (currentStage != null) currentStage.SetActive(false);
+        EnterStage(nextStage);
+
+        GameManager.Instance?.ResetForNextStage();
+    }
+
+    private void EnterStage(GameObject stage)
+    {
+        stage.SetActive(true);
+
+        var startPoint = stage.transform.Find("StartPoint");
         if (_playerTransform != null && startPoint != null)
             _playerTransform.position = startPoint.position;
 
-        nextStage.GetComponent<MainStageFlow>()?.Begin(_playerTransform);
-
-        GameManager.Instance?.ResetForNextStage();
+        stage.GetComponent<MainStageFlow>()?.Begin(_playerTransform);
     }
 }
