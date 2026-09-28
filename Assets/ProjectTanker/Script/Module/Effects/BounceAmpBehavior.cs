@@ -1,4 +1,3 @@
-using LitMotion;
 using UnityEngine;
 
 public class BounceAmpBehavior : MonoBehaviour
@@ -19,6 +18,7 @@ public class BounceAmpBehavior : MonoBehaviour
 
     public void Initialize(int bonusPerBounce)
     {
+        if (_bullet != null) _bullet.OnWallBounce -= OnBounce; // 再初期化時の二重購読を防ぐ
         _bullet         = GetComponent<Bullet>();
         _sr             = GetComponent<SpriteRenderer>();
         _bonusPerBounce = bonusPerBounce;
@@ -33,7 +33,6 @@ public class BounceAmpBehavior : MonoBehaviour
         if (_bullet != null) _bullet.OnWallBounce -= OnBounce;
         if (_bullet != null) _bullet.BonusDamage = 0;
         if (_sr    != null) _sr.color = Color.white;
-        transform.localScale = Vector3.one;
         _bounceCount = 0;
     }
 
@@ -45,11 +44,5 @@ public class BounceAmpBehavior : MonoBehaviour
 
         int colorIdx = Mathf.Min(_bounceCount, _bounceColors.Length - 1);
         if (_sr != null) _sr.color = _bounceColors[colorIdx];
-
-        float targetScale = 1f + 0.15f * Mathf.Min(_bounceCount, 3);
-        LMotion.Create(targetScale + 0.2f, targetScale, 0.15f)
-            .WithEase(Ease.OutBack)
-            .Bind(s => { if (this != null) transform.localScale = Vector3.one * s; })
-            .AddTo(this);
     }
 }

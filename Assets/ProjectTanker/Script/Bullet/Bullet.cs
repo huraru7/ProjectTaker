@@ -108,6 +108,8 @@ public class Bullet : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<Wall>(out _))
         {
+            if (collision.contacts.Length == 0) return;
+
             // 壁被弾跡を生成
             var contact = collision.contacts[0];
             BulletMarkSpawner.Instance?.Spawn(contact.point, contact.normal);
@@ -128,6 +130,13 @@ public class Bullet : MonoBehaviour
             if (targetStatus != null)
                 OnImpact?.Invoke(transform.position, targetStatus);
             if (_owner != null) _owner.ReturnBullet(this);
+            return;
+        }
+
+        if (collision.gameObject.TryGetComponent<Bullet>(out _))
+        {
+            // 弾同士がぶつかった場合は互いに消滅する（衝突した双方でこの処理が呼ばれる）
+            ForceReturn();
         }
     }
 }

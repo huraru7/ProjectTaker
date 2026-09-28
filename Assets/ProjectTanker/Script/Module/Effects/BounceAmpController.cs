@@ -25,8 +25,9 @@ public class BounceAmpController : MonoBehaviour
     private void HandleBulletFired(Bullet bullet)
     {
         var existing = bullet.GetComponent<BounceAmpBehavior>();
-        if (existing != null) Destroy(existing);
-        bullet.gameObject.AddComponent<BounceAmpBehavior>()
-            .Initialize(_bonusPerBounce);
+        if (existing != null)
+            existing.Initialize(_bonusPerBounce);
+        else
+            bullet.gameObject.AddComponent<BounceAmpBehavior>().Initialize(_bonusPerBounce);
     }
 }
