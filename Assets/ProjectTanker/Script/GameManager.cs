@@ -46,8 +46,13 @@ public class GameManager : MonoBehaviour
                 _statTracker?.ShotCount ?? 0,
                 _statTracker?.ElapsedSeconds ?? 0f,
                 _statTracker?.TraveledMeters ?? 0f);
-        else
+        else if (_resultUI != null)
             _resultUI.Show(isWin);
+        else
+            Debug.LogWarning("[GameManager] _resultUI が未設定です。インスペクタで紐付けてください。");
+
+        // ヒットストップの遅延復元がこのポーズを上書きしないよう、先にキャンセルしておく
+        HitStop.Instance?.CancelWithoutRestoring();
         Time.timeScale = 0f;
     }
 }

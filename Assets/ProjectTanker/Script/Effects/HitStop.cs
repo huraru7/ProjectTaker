@@ -21,6 +21,12 @@ public class HitStop : MonoBehaviour
         StartCoroutine(DoHitStop(duration));
     }
 
+    /// <summary>
+    /// 実行中のヒットストップを、timeScaleを1に戻さずに止める。
+    /// クリア/ゲームオーバーでポーズする直前に呼び、遅延復元による上書きを防ぐ。
+    /// </summary>
+    public void CancelWithoutRestoring() => StopAllCoroutines();
+
     private IEnumerator DoHitStop(float duration)
     {
         Time.timeScale = 0.15f;

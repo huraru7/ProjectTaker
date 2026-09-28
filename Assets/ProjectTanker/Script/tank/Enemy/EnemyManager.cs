@@ -30,7 +30,6 @@ public class EnemyManager : MonoBehaviour
             {
                 AudioManager.Instance?.PlayEnemyDead();
                 ExperienceManager.Instance?.DropXp(transform.position, _ai);
-                _ai = null;
                 ExplosionEffect.SpawnAt(transform.position);
                 gameObject.SetActive(false);
             })
