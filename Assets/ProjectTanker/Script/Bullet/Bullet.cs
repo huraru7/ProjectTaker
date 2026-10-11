@@ -5,7 +5,6 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [Tooltip("BulletSetting")]
-    [SerializeField] private int damage = 1;
     [SerializeField] private float lifeTime = 5f;
 
     [Header("Trail")]
@@ -15,6 +14,7 @@ public class Bullet : MonoBehaviour
     public event System.Action<Vector2> OnWallBounce;
     public int BonusDamage { get; set; }
 
+    private int _attackPower;
     private float speed;
     private float _currentLifeTime;
     private Rigidbody2D _rb;
@@ -63,8 +63,9 @@ public class Bullet : MonoBehaviour
     }
 
     /// <summary>弾を初期化し、指定した方向へ発射する。</summary>
-    public void Initialize(Vector2 direction, BulletManagerBase owner, float speed)
+    public void Initialize(Vector2 direction, BulletManagerBase owner, float speed, int attackPower)
     {
+        _attackPower = attackPower;
         this.speed = speed;
         _owner = owner;
         _direction = direction.normalized;
@@ -126,7 +127,7 @@ public class Bullet : MonoBehaviour
         {
             if (bulletManager == _owner) return;
             var targetStatus = collision.gameObject.GetComponentInParent<TankStatus>();
-            bulletManager.TakeDamage(damage + BonusDamage);
+            bulletManager.TakeDamage(_attackPower + BonusDamage);
             if (targetStatus != null)
                 OnImpact?.Invoke(transform.position, targetStatus);
             if (_owner != null) _owner.ReturnBullet(this);

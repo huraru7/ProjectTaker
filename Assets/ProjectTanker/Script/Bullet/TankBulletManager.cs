@@ -127,12 +127,15 @@ public class TankBulletManager : BulletManagerBase
     }
 
     private int _wallMask;
+    private readonly List<Vector3> _aimPoints = new();
+    private Vector3[] _aimPointBuffer = System.Array.Empty<Vector3>();
 
     private void UpdateAimLine()
     {
         if (_aimLine == null) return;
 
-        var     points    = new List<Vector3>();
+        var     points    = _aimPoints;
+        points.Clear();
         Vector2 origin    = _barrel.MuzzlePosition;
         Vector2 dir       = _barrel.AimDirection;
         float   remaining = _aimLineLength;
@@ -158,7 +161,10 @@ public class TankBulletManager : BulletManagerBase
         }
 
         _aimLine.positionCount = points.Count;
-        _aimLine.SetPositions(points.ToArray());
+        if (_aimPointBuffer.Length < points.Count)
+            _aimPointBuffer = new Vector3[points.Count];
+        points.CopyTo(_aimPointBuffer);
+        _aimLine.SetPositions(_aimPointBuffer);
     }
 
     public void SpawnBullet(Vector2 direction)
@@ -176,7 +182,7 @@ public class TankBulletManager : BulletManagerBase
 
         b.transform.position = _barrel.MuzzlePosition;
         b.gameObject.SetActive(true);
-        b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value);
+        b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value, _tankStatus.getBaseAttackPower.Value);
         totalRounds.Value--;
         OnBulletFired?.Invoke(b);
         AudioManager.Instance?.PlayShoot();

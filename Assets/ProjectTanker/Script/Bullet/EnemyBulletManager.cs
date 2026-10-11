@@ -87,7 +87,7 @@ public class EnemyBulletManager : BulletManagerBase
 
         b.transform.position = _barrel.MuzzlePosition;
         b.gameObject.SetActive(true);
-        b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value);
+        b.Initialize(direction, this, _tankStatus.getBulletSpeed.Value, _tankStatus.getBaseAttackPower.Value);
         totalRounds.Value--;
     }
 
