@@ -95,7 +95,11 @@ public class ChaseAndFireAI : EnemyAIBase
         }
 
         // バウンスショット（難易度 3 以上かつ直接射撃 NG 時）
-        if (_useBounceShots && AIUtil.TryGetBounceShot(selfPos, manager.PlayerTransform.position, _effectiveFireAngle, out Vector2 bounceDir))
+        if (_useBounceShots && _fireTimer <= 0f
+            && AIUtil.TryGetBounceShot(selfPos, manager.PlayerTransform.position, _effectiveFireAngle, out Vector2 bounceDir))
+        {
             manager.FireInDirection(bounceDir);
+            _fireTimer = _effectiveFireInterval;
+        }
     }
 }
