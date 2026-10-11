@@ -51,9 +51,13 @@ public static class AIUtil
         return RotateVec(fwd, 90f);
     }
 
+    // 自身のColliderを拾わないよう、壁レイヤーだけを対象にする
+    private static int _wallMask = -1;
+    private static int WallMask => _wallMask != -1 ? _wallMask : (_wallMask = LayerMask.GetMask("Wall"));
+
     private static bool HitsWall(Vector2 from, Vector2 dir, float dist)
     {
-        RaycastHit2D hit = Physics2D.Raycast(from, dir, dist);
+        RaycastHit2D hit = Physics2D.Raycast(from, dir, dist, WallMask);
         return hit && hit.collider.TryGetComponent<Wall>(out _);
     }
 
@@ -85,7 +89,7 @@ public static class AIUtil
             Vector2 dir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
 
             // 最初の hit が Wall でなければ弾も先に別のものに当たるため skip
-            RaycastHit2D wallHit = Physics2D.Raycast(from, dir, MaxRayDist);
+            RaycastHit2D wallHit = Physics2D.Raycast(from, dir, MaxRayDist, WallMask);
             if (!wallHit || !wallHit.collider.TryGetComponent<Wall>(out _)) continue;
 
             // 壁からの反射方向を計算
@@ -97,7 +101,7 @@ public static class AIUtil
 
             // 反射点 → ターゲット間が別の Wall に遮られていないか確認
             float distToTarget = Vector2.Distance(bounceOrigin, target);
-            RaycastHit2D pathCheck = Physics2D.Raycast(bounceOrigin, toTarget, distToTarget);
+            RaycastHit2D pathCheck = Physics2D.Raycast(bounceOrigin, toTarget, distToTarget, WallMask);
             if (pathCheck && pathCheck.collider.TryGetComponent<Wall>(out _)) continue;
 
             // 反射後の経路が発射元（from）を通過しないか確認
