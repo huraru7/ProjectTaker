@@ -94,7 +94,8 @@ public class TitleUI : MonoBehaviour
 
         // ボタン
         _startBtn.clicked  += OnStart;
-        _creditBtn.clicked += OnCredit;
+        // クレジット画面は未実装のため、ボタンを非表示にする
+        _creditBtn.style.display = DisplayStyle.None;
         _startBtn.RegisterCallback<MouseEnterEvent>(_  => _startBtnTargetX  = BtnHoverDist);
         _startBtn.RegisterCallback<MouseLeaveEvent>(_  => _startBtnTargetX  = 0f);
         _creditBtn.RegisterCallback<MouseEnterEvent>(_ => _creditBtnTargetX = BtnHoverDist);
@@ -321,5 +322,4 @@ public class TitleUI : MonoBehaviour
     }
 
     private void OnStart()  => SceneManager.LoadScene("1_MainGame");
-    private void OnCredit() { }
 }
